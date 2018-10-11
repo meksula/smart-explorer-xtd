@@ -40,3 +40,9 @@ Work in progress...
 
 Work in progress...
 
+## Application scheme
+
+# Authentication Http Basic or OAuth2.0 with Facebook
+![alt text](https://github.com/meksula/smart-explorer-xtd/blob/master/images-collection/auth-scheme.png)
+
+
