@@ -1,0 +1,18 @@
+plugins {
+    id 'groovy'
+    id 'java'
+}
+
+group 'pl.smart-explorer.sev2Token'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
