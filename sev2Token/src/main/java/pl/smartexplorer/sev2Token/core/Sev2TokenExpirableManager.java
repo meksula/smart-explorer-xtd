@@ -2,6 +2,8 @@ package pl.smartexplorer.sev2Token.core;
 
 import pl.smartexplorer.sev2Token.core.generator.ExpirableTokenGenerator;
 import pl.smartexplorer.sev2Token.core.generator.TokenGenerator;
+import pl.smartexplorer.sev2Token.core.matcher.ExpirableTokenMatcher;
+import pl.smartexplorer.sev2Token.core.matcher.TokenMatcher;
 import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
 
 /**
@@ -12,9 +14,11 @@ import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
 
 public class Sev2TokenExpirableManager implements Sev2TokenManager {
     private TokenGenerator tokenGenerator;
+    private TokenMatcher tokenMatcher;
 
     public Sev2TokenExpirableManager() {
         this.tokenGenerator = new ExpirableTokenGenerator();
+        this.tokenMatcher = new ExpirableTokenMatcher(120);
     }
 
     @Override
@@ -24,17 +28,13 @@ public class Sev2TokenExpirableManager implements Sev2TokenManager {
     }
 
     @Override
-    public boolean isExpired(String userId) {
-        return false;
+    public boolean isExpired(String encryptedToken) {
+        return tokenMatcher.isTokenExpired(encryptedToken);
     }
 
     @Override
-    public boolean isMatch(String userId, AbstractSev2Token token) {
-        return false;
+    public boolean allowAccess(String encryptedToken, String encodedTokenDatabase) {
+        return tokenMatcher.allowAccess(encryptedToken, encodedTokenDatabase);
     }
 
-    @Override
-    public boolean allowAccess(AbstractSev2Token token) {
-        return false;
-    }
 }

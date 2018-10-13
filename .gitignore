@@ -1,3 +1,5 @@
+/sev2Token/out/
+
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar

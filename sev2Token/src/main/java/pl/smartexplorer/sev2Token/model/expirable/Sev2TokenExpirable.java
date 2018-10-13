@@ -1,6 +1,5 @@
 package pl.smartexplorer.sev2Token.model.expirable;
 
-import pl.smartexplorer.sev2Token.exception.Sev2TokenException;
 import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
 import pl.smartexplorer.sev2Token.model.Sev2TokenType;
 
@@ -53,6 +52,26 @@ public class Sev2TokenExpirable extends AbstractSev2Token {
 
     public boolean isExpired() {
         return isExpired;
+    }
+
+    @Override
+    public int hashCode() {
+        return date.hashCode() + sev2Uiid.hashCode() + tokenType.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Sev2TokenExpirable otherToken = (Sev2TokenExpirable) obj;
+        return this.sev2Uiid.equals(otherToken.getSev2Uiid())
+                && this.date.equals(otherToken.getDate())
+                && this.getUserId().equals(otherToken.getUserId());
+    }
+
+    @Override
+    public String toString() {
+        return "Type: " + tokenType.name()
+                + ",\nDate : " + date.toString()
+                + ",\nUserID: " + this.getUserId();
     }
 
 }
