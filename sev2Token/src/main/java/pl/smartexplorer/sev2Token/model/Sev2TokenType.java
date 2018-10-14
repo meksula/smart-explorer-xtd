@@ -1,5 +1,7 @@
 package pl.smartexplorer.sev2Token.model;
 
+import pl.smartexplorer.sev2Token.model.expirable.Sev2TokenExpirable;
+
 /**
  * @author
  * Karol Meksuła
@@ -7,5 +9,12 @@ package pl.smartexplorer.sev2Token.model;
  * */
 
 public enum Sev2TokenType {
-    EXPIRABLE;
+    EXPIRABLE {
+        @Override
+        public Class<?> getTokenClass() {
+            return Sev2TokenExpirable.class;
+        }
+    };
+
+    public abstract Class<?> getTokenClass();
 }

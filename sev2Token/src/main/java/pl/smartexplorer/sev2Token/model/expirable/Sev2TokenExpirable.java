@@ -16,6 +16,7 @@ public class Sev2TokenExpirable extends AbstractSev2Token {
     private Sev2TokenType tokenType;
     private UUID sev2Uiid;
     private LocalDateTime date;
+    private String ipAddress;
     private boolean isExpired;
 
     public Sev2TokenExpirable(String userId, String username) {
@@ -54,6 +55,14 @@ public class Sev2TokenExpirable extends AbstractSev2Token {
         return isExpired;
     }
 
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
     @Override
     public int hashCode() {
         return date.hashCode() + sev2Uiid.hashCode() + tokenType.hashCode();
@@ -73,5 +82,6 @@ public class Sev2TokenExpirable extends AbstractSev2Token {
                 + ",\nDate : " + date.toString()
                 + ",\nUserID: " + this.getUserId();
     }
+
 
 }
