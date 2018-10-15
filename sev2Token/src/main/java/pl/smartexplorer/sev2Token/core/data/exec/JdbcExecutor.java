@@ -15,9 +15,11 @@ public interface JdbcExecutor {
 
     AbstractSev2Token updateToken(AbstractSev2Token token);
 
+    void deleteEntity(String userId);
+
     Optional<AbstractSev2Token> fetchByUserId(String userId);
 
     Optional<AbstractSev2Token> fetchByUsername(String username);
 
-    void createTable(String tableCreationQuery);
+    void createTable();
 }

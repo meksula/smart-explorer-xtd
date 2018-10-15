@@ -16,6 +16,7 @@ class ExpirableTokenGeneratorTest extends Specification {
     private ExpirableTokenGenerator tokenGenerator
     private final USER_ID = 18813183l
     private final String USERNAME = "Mikolaj.kopernik"
+    private final String IP_ADDRESS = "192.393.29.22"
 
     def setup() {
         this.tokenGenerator = new ExpirableTokenGenerator()
@@ -23,21 +24,21 @@ class ExpirableTokenGeneratorTest extends Specification {
 
     def "token generation test"() {
         when:
-        def token = tokenGenerator.generateToken(String.valueOf(USER_ID), USERNAME)
+        def token = tokenGenerator.generateToken(String.valueOf(USER_ID), USERNAME, IP_ADDRESS)
         def tokenString = tokenGenerator.encodeToken(token)
 
         then:
         token instanceof Sev2TokenExpirable
-        tokenString.length() == 140
+        tokenString.length() == 160
     }
 
     def "regex test"() {
         given:
-        def tokenAsString = "{18813183+Mikolaj.kopernik+EXPIRABLE+false+2018-10-12T23:40:07.733+9bb7ae69-91b4-424f-835e-54459d401105}"
+        def tokenAsString = "{18813183+Mikolaj.kopernik+EXPIRABLE+false+2018-10-12T23:40:07.733+9bb7ae69-91b4-424f-835e-54459d401105+192.93.292.22}"
 
         when:
         Pattern pattern = Pattern.compile("\\{{1}[0-9]+\\+[a-zA-Z0-9.-=]+\\+[A-Z]+\\+[falsetrue]+\\+[-.:T0-9]+\\+" +
-                "[-0-9a-zA-Z]+[}]{1}")
+                "[-0-9a-zA-Z]+\\+[0-9.]+[}]{1}")
         Matcher matcher = pattern.matcher(tokenAsString)
 
         then:

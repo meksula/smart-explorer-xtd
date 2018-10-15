@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit
 
 class ExpirableTokenMatcherTest extends Specification {
     private ExpirableTokenMatcher tokenMatcher = new ExpirableTokenMatcher(120)
+    final String IP = "32.324.422.22"
 
     def "time between two LocalDateTime objects test"() {
         setup:
@@ -28,7 +29,7 @@ class ExpirableTokenMatcherTest extends Specification {
 
     def "split token and extract date regex test"() {
         given:
-        def tokenDecoded = "{38292+karoladmin+EXPIRABLE+false+2018-10-13T21:31:40.558+40b5ee4d-24d6-4c63-a2c8-dd3fc9df2d10}"
+        def tokenDecoded = "{38292+karoladmin+EXPIRABLE+false+2018-10-13T21:31:40.558+40b5ee4d-24d6-4c63-a2c8-dd3fc9df2d10+32.324.422.22}"
         String[] splited = tokenDecoded.split("\\+")
 
         expect:
@@ -38,7 +39,7 @@ class ExpirableTokenMatcherTest extends Specification {
 
     def "isTokenExpired test should throw exception"() {
         given: 'token with error in date'
-        def tokenDecoded = "{38292+karoladmin+EXPIRABLE+false+201-10-13T21:31:40.558+40b5ee4d-24d6-4c63-a2c8-dd3fc9df2d10}"
+        def tokenDecoded = "{38292+karoladmin+EXPIRABLE+false+201-10-13T21:31:40.558+40b5ee4d-24d6-4c63-a2c8-dd3fc9df2d10+32.324.422.22}"
         def bytes = Base64.getEncoder().encodeToString(tokenDecoded.getBytes())
         def tokenEncrypted = new String(bytes as byte[], Charset.forName("UTF-8"))
 
@@ -51,7 +52,7 @@ class ExpirableTokenMatcherTest extends Specification {
 
     def "isTokenExpired test : expired - NO ACCESS"() {
         given:
-        def tokenDecoded = "{38292+karoladmin+EXPIRABLE+false+2018-10-12T21:31:40.558+40b5ee4d-24d6-4c63-a2c8-dd3fc9df2d10}"
+        def tokenDecoded = "{38292+karoladmin+EXPIRABLE+false+2018-10-12T21:31:40.558+40b5ee4d-24d6-4c63-a2c8-dd3fc9df2d10+32.324.422.22}"
         def bytes = Base64.getEncoder().encodeToString(tokenDecoded.getBytes())
         def tokenEncrypted = new String(bytes as byte[], Charset.forName("UTF-8"))
 
@@ -62,7 +63,7 @@ class ExpirableTokenMatcherTest extends Specification {
     def "isTokenExpired test : NO expired - ACCESS SUCCESS"() {
         given:
         ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
-        def freshToken = tokenGenerator.generateToken("92424", "karoladmin")
+        def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
         def encodedToken = tokenGenerator.encodeToken(freshToken)
 
         expect: "should return `false` because token is not expired"
@@ -71,7 +72,7 @@ class ExpirableTokenMatcherTest extends Specification {
 
     def "allowAccess : ACCESS"() {
         ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
-        def freshToken = tokenGenerator.generateToken("92424", "karoladmin")
+        def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
         def encodedToken = tokenGenerator.encodeToken(freshToken)
 
         expect:
@@ -80,10 +81,10 @@ class ExpirableTokenMatcherTest extends Specification {
 
     def "allowAccess : ATTEMPT_FAILED"() {
         ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
-        def freshToken = tokenGenerator.generateToken("92424", "karoladmin")
+        def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
         def encodedToken = tokenGenerator.encodeToken(freshToken)
 
-        def freshToken2 = tokenGenerator.generateToken("92424", "karoladmin")
+        def freshToken2 = tokenGenerator.generateToken("92424", "karoladmin", IP)
         def encodedToken2 = tokenGenerator.encodeToken(freshToken2)
 
         expect:

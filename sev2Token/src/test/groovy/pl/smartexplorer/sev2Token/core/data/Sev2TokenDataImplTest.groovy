@@ -20,8 +20,6 @@ class Sev2TokenDataImplTest extends Specification {
     final String PASSWORD_POSTGRES = "karolpass"
     private Sev2TokenData sev2TokenData
 
-
-
     def setup() {
         this.sev2TokenData = new Sev2TokenDataImpl(DatabasesAvailable.MYSQL, Sev2TokenType.EXPIRABLE, DB_ADDRESS_MYSQL, USERNAME, PASSWORD)
     }
@@ -32,7 +30,7 @@ class Sev2TokenDataImplTest extends Specification {
                 "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), PRIMARY KEY(id));"
 
         expect:
-        sev2TokenData.createTable(SQL_QUERY)
+        sev2TokenData.createTable()
     }
 
     def "creation table in Postgresql database test"() {
@@ -43,7 +41,7 @@ class Sev2TokenDataImplTest extends Specification {
         def tokenData = new Sev2TokenDataImpl(DatabasesAvailable.POSTGRESQL, Sev2TokenType.EXPIRABLE, DB_ADDRESS_POSGRES, USERNAME_POSTGRES, PASSWORD_POSTGRES)
 
         expect:
-        tokenData.createTable(SQL_QUERY_POSTGRES)
+        tokenData.createTable()
     }
 
     def "interface correctness check test"() {

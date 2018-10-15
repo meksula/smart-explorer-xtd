@@ -14,9 +14,10 @@ public enum DatabasesAvailable {
         }
 
         @Override
-        public String getTableCreationQuery() {
-            return "CREATE TABLE sev2token (id INTEGER NOT NULL AUTO_INCREMENT, userId VARCHAR(255), " +
-                    "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), PRIMARY KEY(id));";
+        public String getTableCreationQuery(String tableName) {
+            return "CREATE TABLE " + tableName + " (id INTEGER NOT NULL AUTO_INCREMENT, userId VARCHAR(255), " +
+                    "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), issue_date VARCHAR(255), " +
+                    "ip_address VARCHAR(255), isExpired VARCHAR(5), PRIMARY KEY(id));";
         }
     },
     POSTGRESQL {
@@ -26,13 +27,14 @@ public enum DatabasesAvailable {
         }
 
         @Override
-        public String getTableCreationQuery() {
-            return "CREATE TABLE sev2token (id SERIAL, userId VARCHAR(255), " +
-                    "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), PRIMARY KEY(id));";
+        public String getTableCreationQuery(String tableName) {
+            return "CREATE TABLE " + tableName + " (id SERIAL, userId VARCHAR(255), " +
+                    "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), issue_date VARCHAR(255), " +
+                    "ip_address VARCHAR(255), isExpired VARCHAR(5), PRIMARY KEY(id));";
         }
     };
 
     public abstract String getDatabaseDriver();
 
-    public abstract String getTableCreationQuery();
+    public abstract String getTableCreationQuery(final String tableName);
 }

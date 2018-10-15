@@ -9,7 +9,7 @@ import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
  * */
 
 public interface TokenGenerator {
-    AbstractSev2Token generateToken(String userId, String username);
+    AbstractSev2Token generateToken(String userId, String username, String ipAddress);
 
     String encodeToken(AbstractSev2Token token);
 }

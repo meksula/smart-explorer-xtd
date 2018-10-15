@@ -5,10 +5,6 @@ import pl.smartexplorer.sev2Token.core.data.exec.JdbcExecutorFactory;
 import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
 import pl.smartexplorer.sev2Token.model.Sev2TokenType;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Optional;
 
 /**
@@ -49,9 +45,9 @@ public class Sev2TokenDataImpl implements Sev2TokenData {
     }
 
     @Override
-    public boolean createTable(final String QUERY) {
+    public boolean createTable() {
         try {
-            jdbcExecutor.createTable(database.getTableCreationQuery());
+            jdbcExecutor.createTable();
             return true;
         } catch (Exception ex) {
             return false;

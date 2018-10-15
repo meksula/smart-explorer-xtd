@@ -20,12 +20,13 @@ import java.util.regex.Pattern;
 public class ExpirableTokenGenerator implements TokenGenerator {
 
     @Override
-    public AbstractSev2Token generateToken(String userId, String username) {
+    public AbstractSev2Token generateToken(String userId, String username, String ipAddress) {
         Sev2TokenExpirable sev2Token = new Sev2TokenExpirable(userId, username);
         sev2Token.setDate(LocalDateTime.now());
         sev2Token.setExpired(false);
         sev2Token.setSev2Uiid(UUID.randomUUID());
         sev2Token.setTokenType(Sev2TokenType.EXPIRABLE);
+        sev2Token.setIpAddress(ipAddress);
         return sev2Token;
     }
 
@@ -49,6 +50,8 @@ public class ExpirableTokenGenerator implements TokenGenerator {
         stringBuilder.append(token.getDate().toString());
         stringBuilder.append("+");
         stringBuilder.append(token.getSev2Uiid().toString());
+        stringBuilder.append("+");
+        stringBuilder.append(token.getIpAddress());
         stringBuilder.append("}");
 
         String tokenAsString = stringBuilder.toString();
@@ -62,7 +65,7 @@ public class ExpirableTokenGenerator implements TokenGenerator {
 
     private boolean regexCompatible(String tokenAsString) {
         Pattern regex = Pattern.compile("\\{{1}[0-9A-Za-z]+\\+[a-zA-Z0-9.-=]{6,}\\+[A-Z]+\\+[falsetrue]+\\+[-.:T0-9]+\\+" +
-                "[-0-9a-zA-Z]+[}]{1}");
+                "[-0-9a-zA-Z]+\\+[0-9.]+[}]{1}");
         Matcher matcher = regex.matcher(tokenAsString);
         return matcher.matches();
     }

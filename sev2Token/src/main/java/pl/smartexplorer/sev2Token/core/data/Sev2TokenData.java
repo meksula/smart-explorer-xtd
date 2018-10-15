@@ -19,5 +19,5 @@ public interface Sev2TokenData {
 
     Optional<AbstractSev2Token> fetchByUsername(String username);
 
-    boolean createTable(final String QUERY);
+    boolean createTable();
 }

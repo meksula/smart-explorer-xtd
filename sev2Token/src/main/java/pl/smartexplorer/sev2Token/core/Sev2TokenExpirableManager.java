@@ -22,8 +22,8 @@ public class Sev2TokenExpirableManager implements Sev2TokenManager {
     }
 
     @Override
-    public String generate(String userId, String username) {
-        AbstractSev2Token token = tokenGenerator.generateToken(userId, username);
+    public String generate(String userId, String username, String ipAddress) {
+        AbstractSev2Token token = tokenGenerator.generateToken(userId, username, ipAddress);
         return tokenGenerator.encodeToken(token);
     }
 
