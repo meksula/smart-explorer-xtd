@@ -1,7 +1,6 @@
 package pl.smartexplorer.sev2Token.core.data
 
 import pl.smartexplorer.sev2Token.model.Sev2TokenType
-import pl.smartexplorer.sev2Token.model.expirable.Sev2TokenExpirable
 import spock.lang.Specification
 
 /**
@@ -42,14 +41,6 @@ class Sev2TokenDataImplTest extends Specification {
 
         expect:
         tokenData.createTable()
-    }
-
-    def "interface correctness check test"() {
-        given:
-        def tokenData = new Sev2TokenDataImpl(DatabasesAvailable.POSTGRESQL, Sev2TokenType.EXPIRABLE, DB_ADDRESS_POSGRES, USERNAME_POSTGRES, PASSWORD_POSTGRES)
-
-        expect:
-        tokenData.save(new Sev2TokenExpirable("42542552", "karoladmin"))
     }
 
 }

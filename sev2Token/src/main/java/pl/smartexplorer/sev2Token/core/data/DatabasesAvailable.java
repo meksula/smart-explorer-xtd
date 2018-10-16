@@ -15,9 +15,9 @@ public enum DatabasesAvailable {
 
         @Override
         public String getTableCreationQuery(String tableName) {
-            return "CREATE TABLE " + tableName + " (id INTEGER NOT NULL AUTO_INCREMENT, userId VARCHAR(255), " +
+            return "CREATE TABLE " + tableName + " (userId VARCHAR(255) NOT NULL, " +
                     "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), issue_date VARCHAR(255), " +
-                    "ip_address VARCHAR(255), isExpired VARCHAR(5), PRIMARY KEY(id));";
+                    "ip_address VARCHAR(255), isExpired VARCHAR(5), PRIMARY KEY(userId));";
         }
     },
     POSTGRESQL {
@@ -28,9 +28,9 @@ public enum DatabasesAvailable {
 
         @Override
         public String getTableCreationQuery(String tableName) {
-            return "CREATE TABLE " + tableName + " (id SERIAL, userId VARCHAR(255), " +
+            return "CREATE TABLE " + tableName + " (userId VARCHAR(255) NOT NULL, " +
                     "username VARCHAR(255), sev2TokenType VARCHAR (255), uuid VARCHAR (255), issue_date VARCHAR(255), " +
-                    "ip_address VARCHAR(255), isExpired VARCHAR(5), PRIMARY KEY(id));";
+                    "ip_address VARCHAR(255), isExpired VARCHAR(5), PRIMARY KEY(userId));";
         }
     };
 

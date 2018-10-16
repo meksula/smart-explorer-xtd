@@ -2,10 +2,13 @@ package pl.smartexplorer.sev2Token.core.data.exec;
 
 import pl.smartexplorer.sev2Token.core.data.DatabasesAvailable;
 import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
+import pl.smartexplorer.sev2Token.model.Sev2TokenType;
 import pl.smartexplorer.sev2Token.model.expirable.Sev2TokenExpirable;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author
@@ -13,6 +16,7 @@ import java.util.Optional;
  * 14-10-2018
  * */
 
+//TODO to refactor and cleanup
 public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
     private DatabasesAvailable database;
     private String jdbcDriver;
@@ -52,7 +56,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
             statement.setString(6, tokenExpirable.getIpAddress());
             statement.setString(7, String.valueOf(tokenExpirable.isExpired()));
 
-            statement.executeUpdate();
+            statement.execute();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
@@ -73,7 +77,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
     public AbstractSev2Token updateToken(AbstractSev2Token token) {
         Sev2TokenExpirable tokenExpirable = (Sev2TokenExpirable) token;
         final String SAVE_QUERY = "UPDATE " + TABLE_NAME_DEFAULT +
-                " SET sev2TokenType = ?, uuid = ?, issue_date = ?, ip_address = ?, isExpired = ? WHERE userid = ?;";
+                " SET sev2TokenType = ?, uuid = ?, issue_date = ?, ip_address = ?, isExpired = ? WHERE userId = ?;";
         PreparedStatement statement = null;
 
         try {
@@ -88,8 +92,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
             statement.setString(5, String.valueOf(tokenExpirable.isExpired()));
             statement.setString(6, tokenExpirable.getUserId());
 
-            deleteEntity(token.getUserId());
-            statement.executeUpdate();
+            statement.execute();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
@@ -134,7 +137,64 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
 
     @Override
     public Optional<AbstractSev2Token> fetchByUserId(String userId) {
-        return Optional.empty();
+        PreparedStatement statement = null;
+        Sev2TokenExpirable tokenExpirable = null;
+
+        try {
+            Class.forName(jdbcDriver);
+            this.connection = DriverManager.getConnection(databaseAddress, username, password);
+            statement = this.connection.prepareStatement("SELECT * FROM " + TABLE_NAME_DEFAULT + " WHERE userId = ?");
+            statement.setString(1, userId);
+
+            ResultSet resultSet = statement.executeQuery();
+            
+            tokenExpirable = buildToken(resultSet);
+            
+            resultSet.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return Optional.ofNullable(tokenExpirable);
+    }
+
+    private Sev2TokenExpirable buildToken(ResultSet resultSet) {
+        try {
+            if (resultSet.next()) {
+                String userId = resultSet.getString("userId");
+                String username = resultSet.getString("username");
+                String sev2TokenType = resultSet.getString("sev2TokenType");
+                String uuid = resultSet.getString("uuid");
+                String issue_date = resultSet.getString("issue_date");
+                String ip_address = resultSet.getString("ip_address");
+                String isExpired = resultSet.getString("isExpired");
+
+                Sev2TokenExpirable tokenExpirable = new Sev2TokenExpirable(userId, username);
+                tokenExpirable.setTokenType(Sev2TokenType.valueOf(sev2TokenType));
+                tokenExpirable.setSev2Uiid(UUID.fromString(uuid));
+                tokenExpirable.setDate(LocalDateTime.parse(issue_date));
+                tokenExpirable.setIpAddress(ip_address);
+                tokenExpirable.setExpired(Boolean.parseBoolean(isExpired));
+                return tokenExpirable;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override

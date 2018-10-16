@@ -1,5 +1,7 @@
 package pl.smartexplorer.sev2Token.core.matcher;
 
+import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
+
 /**
  * @author
  * Karol Meksuła
@@ -10,4 +12,6 @@ public interface TokenMatcher {
     boolean isTokenExpired(String encryptedToken);
 
     boolean allowAccess(String encryptedTokenPost, String tokenFromDatabase);
+
+    boolean allowAccess(String encryptedTokenPost, AbstractSev2Token abstractSev2Token);
 }

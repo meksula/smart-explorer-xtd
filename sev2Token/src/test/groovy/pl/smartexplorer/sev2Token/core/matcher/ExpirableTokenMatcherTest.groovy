@@ -71,6 +71,7 @@ class ExpirableTokenMatcherTest extends Specification {
     }
 
     def "allowAccess : ACCESS"() {
+        setup:
         ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
         def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
         def encodedToken = tokenGenerator.encodeToken(freshToken)
@@ -80,6 +81,7 @@ class ExpirableTokenMatcherTest extends Specification {
     }
 
     def "allowAccess : ATTEMPT_FAILED"() {
+        setup:
         ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
         def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
         def encodedToken = tokenGenerator.encodeToken(freshToken)
@@ -89,6 +91,39 @@ class ExpirableTokenMatcherTest extends Specification {
 
         expect:
         !tokenMatcher.allowAccess(encodedToken, encodedToken2)
+    }
+
+    def "extract parameters from encoded token test"() {
+        setup:
+        ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
+        def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
+        def encodedToken = tokenGenerator.encodeToken(freshToken)
+
+        expect:
+        def params = tokenMatcher.extractParametersFromToken(encodedToken)
+        println(params)
+    }
+
+    def "overloaded method test : allow ACCESS"() {
+        setup:
+        ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
+        def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
+        def encodedToken = tokenGenerator.encodeToken(freshToken)
+
+        expect:
+        tokenMatcher.allowAccess(encodedToken, freshToken)
+    }
+
+    def "overloaded method test : allow FAILED"() {
+        setup:
+        ExpirableTokenGenerator tokenGenerator = new ExpirableTokenGenerator()
+        def freshToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
+        def encodedToken = tokenGenerator.encodeToken(freshToken)
+
+        def otherToken = tokenGenerator.generateToken("92424", "karoladmin", IP)
+
+        expect:
+        !tokenMatcher.allowAccess(encodedToken, otherToken)
     }
 
 }

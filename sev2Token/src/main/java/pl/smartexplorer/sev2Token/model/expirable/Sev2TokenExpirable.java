@@ -73,14 +73,20 @@ public class Sev2TokenExpirable extends AbstractSev2Token {
         Sev2TokenExpirable otherToken = (Sev2TokenExpirable) obj;
         return this.sev2Uiid.equals(otherToken.getSev2Uiid())
                 && this.date.equals(otherToken.getDate())
-                && this.getUserId().equals(otherToken.getUserId());
+                && this.getUserId().equals(otherToken.getUserId())
+                && this.getUsername().equals(otherToken.getUsername())
+                && this.getIpAddress().equals(otherToken.getIpAddress());
     }
 
     @Override
     public String toString() {
-        return "Type: " + tokenType.name()
-                + ",\nDate : " + date.toString()
-                + ",\nUserID: " + this.getUserId();
+        return "Type: " + this.tokenType.name()
+                + ",\nDate : " + this.date.toString()
+                + ",\nUserID: " + this.getUserId()
+                + ",\nusername: " + this.getUsername()
+                + ",\nUUID: " + this.getSev2Uiid()
+                + ",\nipAddress: " + this.getIpAddress()
+                + ",\nisExpired: " + this.isExpired();
     }
 
 

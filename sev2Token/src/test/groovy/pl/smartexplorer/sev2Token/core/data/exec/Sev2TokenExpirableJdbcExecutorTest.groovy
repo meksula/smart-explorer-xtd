@@ -46,15 +46,30 @@ class Sev2TokenExpirableJdbcExecutorTest extends Specification {
     def "update saved before entity in database"() {
         setup:
         executor.createTable()
+        executor.saveToken(sev2TokenExpirable)
 
-        expect:
+        expect: "by default should be `false`, to differ result set `true`"
         sev2TokenExpirable.setExpired(true)
         sev2TokenExpirable.setIpAddress("11.111.111.11")
-        executor.saveToken(sev2TokenExpirable)
+        executor.updateToken(sev2TokenExpirable)
     }
 
     def "delete entity test"() {
         expect:
+        executor.deleteEntity(userId)
+    }
+
+    def "fetch entity test"() {
+        setup: "first, save entity"
+        executor.saveToken(sev2TokenExpirable)
+
+        expect:
+        executor.fetchByUserId(userId).isPresent()
+        Sev2TokenExpirable tokenExpirable = executor.fetchByUserId(sev2TokenExpirable.getUserId()).get()
+        println(tokenExpirable.toString())
+    }
+
+    void cleanup() {
         executor.deleteEntity(userId)
     }
 
