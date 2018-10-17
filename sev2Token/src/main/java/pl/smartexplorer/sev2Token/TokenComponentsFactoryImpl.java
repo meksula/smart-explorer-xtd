@@ -1,5 +1,7 @@
 package pl.smartexplorer.sev2Token;
 
+import pl.smartexplorer.sev2Token.core.Sev2TokenExpirableManager;
+import pl.smartexplorer.sev2Token.core.Sev2TokenManager;
 import pl.smartexplorer.sev2Token.core.data.DatabasesAvailable;
 import pl.smartexplorer.sev2Token.core.data.Sev2TokenData;
 import pl.smartexplorer.sev2Token.core.data.Sev2TokenDataImpl;
@@ -41,6 +43,21 @@ public class TokenComponentsFactoryImpl implements TokenComponentsFactory {
 
     @Override
     public TokenMatcher getTokenMatcher(long expireTimeInMinutes) {
-        return new ExpirableTokenMatcher(expireTimeInMinutes);
+        if (sev2TokenType == Sev2TokenType.EXPIRABLE) {
+            return new ExpirableTokenMatcher(expireTimeInMinutes);
+        } else {
+            return null;
+        }
+
     }
+
+    @Override
+    public Sev2TokenManager getSev2TokenManager() {
+        if (sev2TokenType == Sev2TokenType.EXPIRABLE) {
+            return new Sev2TokenExpirableManager();
+        } else {
+            return null;
+        }
+    }
+
 }

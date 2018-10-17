@@ -12,4 +12,6 @@ public interface TokenFacade {
     String generateAndSaveToken(String userId, String username, String ipAddress);
 
     boolean allowAccess(String userId, String encryptedToken);
+
+    boolean isExpired(String userId);
 }

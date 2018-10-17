@@ -12,6 +12,7 @@ import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
  * 12-10-2018
  * */
 
+@Deprecated
 public class Sev2TokenExpirableManager implements Sev2TokenManager {
     private TokenGenerator tokenGenerator;
     private TokenMatcher tokenMatcher;

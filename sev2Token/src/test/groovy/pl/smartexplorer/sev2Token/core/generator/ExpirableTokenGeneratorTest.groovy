@@ -29,7 +29,7 @@ class ExpirableTokenGeneratorTest extends Specification {
 
         then:
         token instanceof Sev2TokenExpirable
-        tokenString.length() == 160
+        tokenString.length() > 150
     }
 
     def "regex test"() {

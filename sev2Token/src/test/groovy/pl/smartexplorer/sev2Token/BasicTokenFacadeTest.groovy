@@ -2,6 +2,7 @@ package pl.smartexplorer.sev2Token
 
 import pl.smartexplorer.sev2Token.core.data.DatabasesAvailable
 import pl.smartexplorer.sev2Token.core.data.exec.Sev2TokenExpirableJdbcExecutor
+import pl.smartexplorer.sev2Token.exception.Sev2TokenException
 import pl.smartexplorer.sev2Token.model.Sev2TokenType
 import spock.lang.Specification
 
@@ -27,6 +28,51 @@ class BasicTokenFacadeTest extends Specification {
 
         then:
         assert tokenFacade.allowAccess(userId, token)
+    }
+
+    def "builder test : should throw exception"() {
+        when:
+        new BasicTokenFacade.BasicTokenFacadeBuilder().build()
+
+        then:
+        thrown(Sev2TokenException)
+    }
+
+    def "builder test : should build object with SUCCESS"() {
+        given:
+        def basicTokenFacade = new BasicTokenFacade.BasicTokenFacadeBuilder()
+                .sev2TokenType(Sev2TokenType.EXPIRABLE)
+                .expirableTimeInMinutes(120)
+                .databaseAvailable(DatabasesAvailable.MYSQL)
+                .databaseAddress(DB_ADDRESS_MYSQL)
+                .dbUsername("chat")
+                .dbPassword("password")
+                .build()
+
+        expect:
+        basicTokenFacade != null
+    }
+
+    def "BasicTokenFacade flow test"() {
+        given:
+        def basicTokenFacade = new BasicTokenFacade.BasicTokenFacadeBuilder()
+                .sev2TokenType(Sev2TokenType.EXPIRABLE)
+                .expirableTimeInMinutes(120)
+                .databaseAvailable(DatabasesAvailable.MYSQL)
+                .databaseAddress(DB_ADDRESS_MYSQL)
+                .dbUsername("chat")
+                .dbPassword("chatdefault")
+                .build()
+
+        expect:
+        def token = basicTokenFacade.generateAndSaveToken(id, name, ip)
+        def access = basicTokenFacade.allowAccess(id, token)
+        println(access)
+
+        where:
+        id      |   name        |   ip
+        "73732" |"andrzejerk22" | "193.928.28.22"
+        "82932" |"maciek18ddj"  | "193.282.28.22"
     }
 
     def cleanup() {

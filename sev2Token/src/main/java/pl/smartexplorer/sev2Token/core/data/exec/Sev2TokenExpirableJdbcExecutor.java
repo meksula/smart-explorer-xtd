@@ -10,13 +10,15 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author
  * Karol Meksuła
  * 14-10-2018
  * */
 
-//TODO to refactor and cleanup
 public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
     private DatabasesAvailable database;
     private String jdbcDriver;
@@ -26,6 +28,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
     private Connection connection = null;
     private Statement statement = null;
     private final static String TABLE_NAME_DEFAULT = "sev2token";
+    private static final Logger logger = LoggerFactory.getLogger(Sev2TokenExpirableJdbcExecutor.class);
 
     public Sev2TokenExpirableJdbcExecutor(DatabasesAvailable database, final String databaseAddress, final String username,
                                           final String password) {
@@ -34,6 +37,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
         this.databaseAddress = databaseAddress;
         this.username = username;
         this.password = password;
+        logger.info(this.getClass() + " just instantiated.");
     }
 
     @Override
@@ -58,19 +62,25 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
 
             statement.execute();
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Cannot save entity. Exception was thrown.");
         } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            finalizeStatement();
         }
 
         return token;
+    }
+
+    private void finalizeStatement() {
+        try {
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            logger.error("Cannot properly close SQL statement or connection.");
+        }
     }
 
     @Override
@@ -94,16 +104,9 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
 
             statement.execute();
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getClass() + " was thrown. Update not processed.");
         } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            finalizeStatement();
         }
 
         return token;
@@ -111,33 +114,25 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
 
     @Override
     public void deleteEntity(String userId) {
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             Class.forName(jdbcDriver);
             this.connection = DriverManager.getConnection(databaseAddress, username, password);
             statement = connection.prepareStatement("DELETE FROM " + TABLE_NAME_DEFAULT + " WHERE userId = ?;");
-
             statement.setString(1, userId);
 
             statement.execute();
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getClass() + " was thrown. Delete not processed.");
         } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            finalizeStatement();
         }
     }
 
     @Override
     public Optional<AbstractSev2Token> fetchByUserId(String userId) {
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         Sev2TokenExpirable tokenExpirable = null;
 
         try {
@@ -152,19 +147,9 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
             
             resultSet.close();
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getClass() + " was thrown. Delete not processed.");
         } finally {
-            try {
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            finalizeStatement();
         }
 
         return Optional.ofNullable(tokenExpirable);
@@ -191,7 +176,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Entity is not able to fetch or mapping to Java object.");
         }
 
         return null;
@@ -212,11 +197,7 @@ public class Sev2TokenExpirableJdbcExecutor implements JdbcExecutor {
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            finalizeStatement();
         }
     }
 
