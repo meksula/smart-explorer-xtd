@@ -1,0 +1,12 @@
+.present {
+    height: 20%;
+    width: 30%;
+    float: right;
+}
+
+.chronicle-img {
+    height: 60%;
+    width: 60%;
+    padding-left: 10%;
+    overflow: visible;
+}
