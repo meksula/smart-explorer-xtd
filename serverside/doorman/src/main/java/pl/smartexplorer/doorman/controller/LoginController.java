@@ -46,6 +46,7 @@ public class LoginController {
     @GetMapping("/scribe")
     @ResponseStatus(HttpStatus.OK)
     public void loginScribe(HttpServletResponse response) throws IOException {
+        log.debug("Redirect to Scribe");
         response.sendRedirect("http://localhost:8030/login");
     }
 
