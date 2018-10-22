@@ -15,4 +15,5 @@ public class CerberApplication {
     public static void main(String[] args) {
         SpringApplication.run(CerberApplication.class, args);
     }
+
 }
