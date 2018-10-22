@@ -45,4 +45,5 @@ Work in progress...
 # Authentication Http Basic or OAuth2.0 with Facebook
 ![alt text](https://github.com/meksula/smart-explorer-xtd/blob/master/images-collection/auth-scheme.png)
 
-
+# How Sev2Token interact between services
+![alt text](https://github.com/meksula/smart-explorer-xtd/blob/master/images-collection/sev2token-flow.png)
