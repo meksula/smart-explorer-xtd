@@ -31,7 +31,17 @@ public class ExpirableTokenMatcher implements TokenMatcher {
     public boolean isTokenExpired(String encryptedToken) {
         String decoded = new String(Base64.getDecoder().decode(encryptedToken), Charset.forName("UTF-8"));
         LocalDateTime tokenReleaseDate = extractDateFromToken(decoded);
-        long minutesElapsed = ChronoUnit.MINUTES.between(tokenReleaseDate, LocalDateTime.now());
+        return tokenExpirationTimeCompute(tokenReleaseDate);
+    }
+
+    @Override
+    public boolean isTokenExpired(AbstractSev2Token abstractSev2Token) {
+        Sev2TokenExpirable tokenExpirable = (Sev2TokenExpirable) abstractSev2Token;
+        return tokenExpirationTimeCompute(tokenExpirable.getDate());
+    }
+
+    private boolean tokenExpirationTimeCompute(LocalDateTime tokenGenTime) {
+        long minutesElapsed = ChronoUnit.MINUTES.between(tokenGenTime, LocalDateTime.now());
 
         return minutesElapsed > tokenExpirationTime;
     }
