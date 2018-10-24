@@ -10,4 +10,6 @@ import pl.smartexplorer.cerber.dto.TokenEstablishData;
 
 public interface TokenManager {
     String generateTokenAndSave(TokenEstablishData establishData);
+
+    String updateTokenAndUpdate(TokenEstablishData establishData);
 }

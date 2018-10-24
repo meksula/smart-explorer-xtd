@@ -26,4 +26,10 @@ public class TokenEstablishController {
         return tokenManager.generateTokenAndSave(establishData);
     }
 
+    /*@PostMapping("/update")
+    @ResponseStatus(HttpStatus.OK)
+    public String establishNewToken(@RequestBody TokenEstablishData establishData) {
+        return tokenManager.generateTokenAndSave(establishData);
+    }*/
+
 }

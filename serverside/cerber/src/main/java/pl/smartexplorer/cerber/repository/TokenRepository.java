@@ -2,6 +2,8 @@ package pl.smartexplorer.cerber.repository;
 
 import pl.smartexplorer.sev2Token.model.AbstractSev2Token;
 
+import java.util.Optional;
+
 /**
  * @author
  * Karol Meksuła
@@ -13,9 +15,9 @@ public interface TokenRepository {
 
     AbstractSev2Token update(AbstractSev2Token token);
 
-    AbstractSev2Token delete(AbstractSev2Token token);
+    boolean delete(AbstractSev2Token token);
 
-    AbstractSev2Token findByUserId(String userId);
+    Optional<AbstractSev2Token> findByUserId(String userId);
 
-    AbstractSev2Token findByUsername(String username);
+    Optional<AbstractSev2Token> findByUsername(String username);
 }
