@@ -47,3 +47,6 @@ Work in progress...
 
 # How Sev2Token interact between services
 ![alt text](https://github.com/meksula/smart-explorer-xtd/blob/master/images-collection/sev2token-flow.png)
+
+# More details about sev2token and paths
+![alt text](https://github.com/meksula/smart-explorer-xtd/blob/master/images-collection/authentication-details-diagram.png)
