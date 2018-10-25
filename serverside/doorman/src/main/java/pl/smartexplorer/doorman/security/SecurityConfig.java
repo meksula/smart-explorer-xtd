@@ -30,6 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+                .failureHandler((request, response, exception) -> response.sendRedirect("http://localhost:8010/login/error"))
                 .permitAll()
                 .and()
                 .logout()
