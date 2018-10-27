@@ -16,7 +16,7 @@ import pl.smartexplorer.cerber.exception.TokenUpdateException;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
-    /*@ExceptionHandler(TokenUpdateException.class)
+    @ExceptionHandler(TokenUpdateException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String tokenCannotBeUpdate() {
         return TokenUpdateException.message;
@@ -26,6 +26,6 @@ public class CustomExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String cannotUpdateBecauseJustExist() {
         return SmartExplorerRepositoryException.message;
-    }*/
+    }
 
 }

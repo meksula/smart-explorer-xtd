@@ -59,7 +59,7 @@ class TokenEstablishControllerTest extends Specification {
 
         then:
         println(json)
-        response.andExpect(status().isCreated())
+        response.andExpect(status().isOk())
 
         and:
         response.andExpect(jsonPath('$.decision').value('true'))
@@ -77,7 +77,7 @@ class TokenEstablishControllerTest extends Specification {
                 .APPLICATION_JSON).content(json))
 
         then:
-        response.andExpect(status().isConflict())
+        response.andExpect(status().isOk())
 
         and:
         response.andExpect(jsonPath('$.decision').value('false'))
@@ -110,7 +110,7 @@ class TokenEstablishControllerTest extends Specification {
                 .content(json))
 
         then:
-        response.andExpect(status().isConflict())
+        response.andExpect(status().isOk())
 
         and:
         response.andExpect(jsonPath('$.decision').value('false'))

@@ -1,12 +1,11 @@
 package pl.smartexplorer.cerber.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.smartexplorer.cerber.dto.CerberAuthDecission;
 import pl.smartexplorer.cerber.dto.TokenEstablishData;
 import pl.smartexplorer.cerber.security.TokenManager;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author
@@ -27,28 +26,17 @@ public class TokenEstablishController {
      * This endpoint is enable for new users that wants to create account.
      * */
     @PostMapping("/establish")
-    public CerberAuthDecission establishNewToken(@RequestBody TokenEstablishData establishData, HttpServletResponse response) {
-        CerberAuthDecission cerberAuthDecission = tokenManager.generateTokenAndSave(establishData);
-        if (cerberAuthDecission.getSev2token() == null)
-            response.setStatus(409);
-        else
-            response.setStatus(201);
-
-        return cerberAuthDecission;
+    public CerberAuthDecission establishNewToken(@RequestBody TokenEstablishData establishData) {
+        return tokenManager.generateTokenAndSave(establishData);
     }
 
     /**
      * This endpoint is enable only for registered users.
      * */
     @PostMapping("/update")
-    public CerberAuthDecission updateToken(@RequestBody TokenEstablishData establishData, HttpServletResponse response) throws JsonProcessingException {
-        CerberAuthDecission cerberAuthDecission = tokenManager.updateToken(establishData);
-        if (cerberAuthDecission.getSev2token() == null)
-            response.setStatus(409);
-        else
-            response.setStatus(200);
-
-        return cerberAuthDecission;
+    @ResponseStatus(HttpStatus.OK)
+    public CerberAuthDecission updateToken(@RequestBody TokenEstablishData establishData) throws JsonProcessingException {
+        return tokenManager.updateToken(establishData);
     }
 
 }

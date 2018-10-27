@@ -32,6 +32,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-jdbc')
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.data:spring-data-rest-hal-browser')
+    implementation('org.springframework.boot:spring-boot-starter-security')
     runtimeOnly('org.postgresql:postgresql')
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     compileOnly('org.projectlombok:lombok')
