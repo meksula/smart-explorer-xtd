@@ -3,13 +3,10 @@ package pl.smartexplorer.cerber.security
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.jdbc.core.JdbcTemplate
 import pl.smartexplorer.cerber.dto.TokenEstablishData
-import pl.smartexplorer.cerber.exception.SmartExplorerRepositoryException
 import pl.smartexplorer.cerber.repository.ExpirableTokenRepository
-import pl.smartexplorer.sev2Token.core.generator.ExpirableTokenGenerator
-import pl.smartexplorer.sev2Token.core.matcher.ExpirableTokenMatcher
-import pl.smartexplorer.sev2Token.model.AbstractSev2Token
-import pl.smartexplorer.sev2Token.model.expirable.Sev2TokenExpirable
+import pl.smartexplorer.cerber.repository.TokenRepository
 import spock.lang.Specification
 
 
@@ -27,67 +24,67 @@ class MainTokenManagerTest extends Specification {
     MainTokenManager tokenManager
 
     @Autowired
-    ExpirableTokenRepository repository
+    JdbcTemplate jdbcTemplate
 
-    TokenEstablishData tokenEstablishData
-    TokenEstablishData invalidEstablishData
+    TokenRepository tokenRepository
 
-    def validUserId = "2942432"
-    def validUsername = "karoladmin"
-    def validIpAddress = "192.392.292.22"
+    def tokenEstablishData = null
 
     def setup() {
-        this.tokenEstablishData = new TokenEstablishData(validUserId, validUsername, validIpAddress)
-        this.invalidEstablishData = new TokenEstablishData(validUserId, validUsername, "129922993")
+        tokenRepository = new ExpirableTokenRepository(jdbcTemplate)
+
+        tokenEstablishData = new TokenEstablishData()
+        tokenEstablishData.setUserId(null)
+        tokenEstablishData.setUsername("mikolajkopernik")
+        tokenEstablishData.setIpAddress("192.33.22.11")
     }
 
-    def "Manager should correctly generate token"() {
+    def "generateTokenAndSave SUCCESS test"() {
         when:
         def encodedToken = tokenManager.generateTokenAndSave(tokenEstablishData)
-        println(encodedToken)
 
         then:
         encodedToken != null
     }
 
-    def "Manager should correctly generate token and save to database"() {
+    def "generateTokenAndSave FAILED test"() {
+        setup:
+        tokenManager.generateTokenAndSave(tokenEstablishData)
+
         when:
-        def encodedToken = tokenManager.generateTokenAndSave(tokenEstablishData)
-        println(encodedToken)
+        def encodedTokenDuplicated = tokenManager.generateTokenAndSave(tokenEstablishData)
 
         then:
-        encodedToken != null
-        AbstractSev2Token token = repository.findByUserId(validUserId).get()
-        assert new ExpirableTokenMatcher(100).allowAccess(encodedToken, token)
+        !encodedTokenDuplicated.isDecision()
+        encodedTokenDuplicated.getMessage() == "User just exist in database so it is impossible to create new same account."
+        encodedTokenDuplicated.sev2token == null
     }
 
-    def "update token of currently exist user"() {
-        when: "token is just saved"
-        def encodedToken = tokenManager.generateTokenAndSave(tokenEstablishData)
-
-        then:
-        tokenManager.updateTokenAndUpdate(tokenEstablishData) // update token of a same user
-        AbstractSev2Token updatedToken = repository.findByUserId(validUserId).get()//fetch updated, changed token from database
-        updatedToken != null
-        !new ExpirableTokenMatcher(100).allowAccess(encodedToken, updatedToken)
-        assert new ExpirableTokenMatcher(100).allowAccess(new ExpirableTokenGenerator().encodeToken(updatedToken), updatedToken)
-    }
-
-    def "try to create new entity to exist user : should throw exception"() {
-        setup: "save one entity"
+    def "updateToken SUCCESS test"() {
+        setup:
         tokenManager.generateTokenAndSave(tokenEstablishData)
 
-        when: "try to save entity with same user_id"
-        tokenManager.generateTokenAndSave(tokenEstablishData)
+        when:
+        def updatedSuccessfully = tokenManager.updateToken(tokenEstablishData)
 
         then:
-        thrown(SmartExplorerRepositoryException.class)
+        assert updatedSuccessfully.decision
+        updatedSuccessfully.sev2token != null
+        updatedSuccessfully.message == "Authentication with success."
     }
 
-    //should cleanup because some method save sth to db
-    void cleanup() {
-        Sev2TokenExpirable expirable = new Sev2TokenExpirable(validUserId, validUsername)
-        repository.delete(expirable)
+    def "updateToken FAILED test"() {
+        when:
+        def updatedFailed = tokenManager.updateToken(tokenEstablishData)
+
+        then:
+        !updatedFailed.decision
+        updatedFailed.sev2token == null
+        updatedFailed.message == "User not exist in database."
+    }
+
+    def cleanup() {
+        tokenRepository.dropTable()
     }
 
 }

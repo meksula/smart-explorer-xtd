@@ -7,15 +7,15 @@ package pl.smartexplorer.cerber.exception;
  * */
 
 public class SmartExplorerRepositoryException extends RuntimeException {
-    private String message;
+    public static String message;
 
     public SmartExplorerRepositoryException(final String message) {
-        this.message = message;
+        SmartExplorerRepositoryException.message = message;
     }
 
     @Override
     public String getMessage() {
-        return super.getMessage();
+        return message;
     }
 
 }

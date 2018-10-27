@@ -1,9 +1,12 @@
 package pl.smartexplorer.cerber.controller;
 
-import org.springframework.http.HttpStatus;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
+import pl.smartexplorer.cerber.dto.CerberAuthDecission;
 import pl.smartexplorer.cerber.dto.TokenEstablishData;
 import pl.smartexplorer.cerber.security.TokenManager;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author
@@ -20,16 +23,32 @@ public class TokenEstablishController {
         this.tokenManager = tokenManager;
     }
 
+    /**
+     * This endpoint is enable for new users that wants to create account.
+     * */
     @PostMapping("/establish")
-    @ResponseStatus(HttpStatus.OK)
-    public String establishNewToken(@RequestBody TokenEstablishData establishData) {
-        return tokenManager.generateTokenAndSave(establishData);
+    public CerberAuthDecission establishNewToken(@RequestBody TokenEstablishData establishData, HttpServletResponse response) {
+        CerberAuthDecission cerberAuthDecission = tokenManager.generateTokenAndSave(establishData);
+        if (cerberAuthDecission.getSev2token() == null)
+            response.setStatus(409);
+        else
+            response.setStatus(201);
+
+        return cerberAuthDecission;
     }
 
-    /*@PostMapping("/update")
-    @ResponseStatus(HttpStatus.OK)
-    public String establishNewToken(@RequestBody TokenEstablishData establishData) {
-        return tokenManager.generateTokenAndSave(establishData);
-    }*/
+    /**
+     * This endpoint is enable only for registered users.
+     * */
+    @PostMapping("/update")
+    public CerberAuthDecission updateToken(@RequestBody TokenEstablishData establishData, HttpServletResponse response) throws JsonProcessingException {
+        CerberAuthDecission cerberAuthDecission = tokenManager.updateToken(establishData);
+        if (cerberAuthDecission.getSev2token() == null)
+            response.setStatus(409);
+        else
+            response.setStatus(200);
+
+        return cerberAuthDecission;
+    }
 
 }

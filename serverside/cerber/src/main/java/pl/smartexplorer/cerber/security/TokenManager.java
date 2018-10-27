@@ -1,5 +1,7 @@
 package pl.smartexplorer.cerber.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import pl.smartexplorer.cerber.dto.CerberAuthDecission;
 import pl.smartexplorer.cerber.dto.TokenEstablishData;
 
 /**
@@ -9,7 +11,7 @@ import pl.smartexplorer.cerber.dto.TokenEstablishData;
  * */
 
 public interface TokenManager {
-    String generateTokenAndSave(TokenEstablishData establishData);
+    CerberAuthDecission generateTokenAndSave(TokenEstablishData establishData);
 
-    String updateTokenAndUpdate(TokenEstablishData establishData);
+    CerberAuthDecission updateToken(TokenEstablishData establishData) throws JsonProcessingException;
 }

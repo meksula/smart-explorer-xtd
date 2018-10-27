@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @Repository
 public class ExpirableTokenRepository implements TokenRepository {
-    private final static String CREATE_TABLE = "CREATE TABLE sev2token(user_id VARCHAR(255) NOT NULL, " +
+    private final static String CREATE_TABLE = "CREATE TABLE sev2token(user_id VARCHAR NOT NULL, " +
             "username VARCHAR(255), sev2_token_type VARCHAR(255), sev2uuid VARCHAR(255), date VARCHAR(255), " +
             "ip_address VARCHAR(255), isexpired VARCHAR (10), primary key(user_id));";
     private final static String EXCEPTION_MSG = "Cannot save entity to database. Some error occurred.";
@@ -77,6 +77,13 @@ public class ExpirableTokenRepository implements TokenRepository {
     }
 
     @Override
+    public boolean deleteByUserId(String userId) {
+        final String DELETE_QUERY = "DELETE FROM sev2token WHERE user_id = ?;";
+        int rows = jdbcTemplate.update(DELETE_QUERY, userId);
+        return rows == 1;
+    }
+
+    @Override
     public Optional<AbstractSev2Token> findByUserId(String userId) {
         final String FIND_BY_USER_ID_QUERY = "SELECT * FROM sev2token WHERE user_id = ?;";
         Sev2TokenExpirable token;
@@ -99,6 +106,11 @@ public class ExpirableTokenRepository implements TokenRepository {
         }
 
         return Optional.ofNullable(token);
+    }
+
+    @Override
+    public void dropTable() {
+        jdbcTemplate.execute("drop table sev2token;");
     }
 
     private final RowMapper<Sev2TokenExpirable> rowMapper = (resultSet, rowNum) -> {

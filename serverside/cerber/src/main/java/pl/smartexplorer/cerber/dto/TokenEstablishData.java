@@ -1,8 +1,8 @@
 package pl.smartexplorer.cerber.dto;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author
@@ -11,7 +11,7 @@ import lombok.Getter;
  * */
 
 @Getter
-@AllArgsConstructor
+@Setter
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class TokenEstablishData {
     private String userId;

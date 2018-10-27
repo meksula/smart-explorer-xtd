@@ -17,7 +17,12 @@ public interface TokenRepository {
 
     boolean delete(AbstractSev2Token token);
 
+    boolean deleteByUserId(String userId);
+
     Optional<AbstractSev2Token> findByUserId(String userId);
 
     Optional<AbstractSev2Token> findByUsername(String username);
+
+    void dropTable();
+
 }
