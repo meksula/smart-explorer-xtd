@@ -1,7 +1,6 @@
 package pl.smartexplorer.scribe.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import pl.smartexplorer.scribe.model.dto.User
 import spock.lang.Specification
 
 /**

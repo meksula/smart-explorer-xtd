@@ -1,6 +1,6 @@
 package pl.smartexplorer.scribe.configuration;
 
-import pl.smartexplorer.scribe.model.dto.User;
+import pl.smartexplorer.scribe.model.User;
 
 import java.util.Optional;
 
@@ -12,4 +12,6 @@ import java.util.Optional;
 
 public interface CustomRestTemplate {
     Optional<User> requestForUser(String username);
+
+    Optional<User> requestForUser(String username, String password);
 }

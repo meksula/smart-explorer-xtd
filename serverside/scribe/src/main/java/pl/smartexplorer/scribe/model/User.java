@@ -1,11 +1,11 @@
-package pl.smartexplorer.scribe.model.dto;
+package pl.smartexplorer.scribe.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.*;
-import pl.smartexplorer.scribe.model.AuthenticationType;
 
 import java.util.*;
 
@@ -15,14 +15,13 @@ import java.util.*;
  * 20-10-2018
  * */
 
-@Getter
-@Setter
+@Data
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class User implements UserDetails {
 
-    private long userId;
-    private AuthenticationType authenticationType;
-    private long userProfileId;
+    @Id
+    private String userId;
+    private String authenticationType;
     private String socialServiceId;
     private String socialUsername;
     private String username;
