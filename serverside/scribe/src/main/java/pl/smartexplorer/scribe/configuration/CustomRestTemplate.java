@@ -1,6 +1,7 @@
 package pl.smartexplorer.scribe.configuration;
 
 import pl.smartexplorer.scribe.model.User;
+import pl.smartexplorer.scribe.model.dto.CerberAuthDecission;
 
 import java.util.Optional;
 
@@ -14,4 +15,6 @@ public interface CustomRestTemplate {
     Optional<User> requestForUser(String username);
 
     Optional<User> requestForUser(String username, String password);
+
+    Optional<CerberAuthDecission> requestForUserAndSev2Token(String username, String password);
 }

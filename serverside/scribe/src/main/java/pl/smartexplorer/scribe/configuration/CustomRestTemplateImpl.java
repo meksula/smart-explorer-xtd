@@ -7,6 +7,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import pl.smartexplorer.scribe.model.User;
+import pl.smartexplorer.scribe.model.dto.CerberAuthDecission;
 import pl.smartexplorer.scribe.model.dto.UserRequest;
 
 import java.util.Optional;
@@ -56,6 +57,22 @@ public class CustomRestTemplateImpl implements CustomRestTemplate {
         }
 
         return Optional.ofNullable(user);
+    }
+
+    @Override
+    public Optional<CerberAuthDecission> requestForUserAndSev2Token(String username, String password) {
+        ResponseEntity<CerberAuthDecission> responseEntity;
+        CerberAuthDecission cerberAuthDecission = null;
+
+        try {
+            responseEntity = restTemplate.postForEntity("http://localhost:8040/api/v2/user/auth", buildUserRequest(username, password), CerberAuthDecission.class);
+            cerberAuthDecission = responseEntity.getBody();
+            log.info("Attempt to get user entity was successful.");
+        } catch (RuntimeException ex) {
+            log.error("Cannot connect with :8040 [Scribe]");
+        }
+
+        return Optional.ofNullable(cerberAuthDecission);
     }
 
     private UserRequest buildUserRequest(String username, String password) {

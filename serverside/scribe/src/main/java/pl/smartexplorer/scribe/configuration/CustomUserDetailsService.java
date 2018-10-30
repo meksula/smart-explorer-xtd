@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements ExtendedUserDetailsService {
 
     @Override
     public UserDetails loadUserByUsernameAndPassword(String username, String password) throws UsernameNotFoundException {
-        return restTemplate.requestForUser(username, password).orElseThrow(() -> new ScribeException(MSG));
+        return restTemplate.requestForUserAndSev2Token(username, password).orElseThrow(() -> new ScribeException(MSG));
     }
 
 }

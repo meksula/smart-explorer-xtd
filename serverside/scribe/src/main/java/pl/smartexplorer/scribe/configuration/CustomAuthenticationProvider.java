@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import pl.smartexplorer.scribe.model.User;
+import pl.smartexplorer.scribe.model.dto.CerberAuthDecission;
 
 import java.util.Collection;
 
@@ -29,11 +30,18 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        User user = (User) userDetailsService.loadUserByUsernameAndPassword(authentication.getName(),
+        CerberAuthDecission cerberAuthDecission = (CerberAuthDecission) userDetailsService.loadUserByUsernameAndPassword(authentication.getName(),
                 authentication.getCredentials().toString());
 
+        User user = cerberAuthDecission.getUser();
+
         log.info("Authentication successful.");
-        return new Authentication() {
+        return new CustomAuthentication() {
+            @Override
+            public String getSev2token() {
+                return cerberAuthDecission.getSev2token();
+            }
+
             @Override
             public Collection<? extends GrantedAuthority> getAuthorities() {
                 return user.getAuthorities();
