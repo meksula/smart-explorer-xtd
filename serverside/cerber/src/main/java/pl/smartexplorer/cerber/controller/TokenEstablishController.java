@@ -13,6 +13,10 @@ import pl.smartexplorer.cerber.security.TokenManager;
  * 22-10-2018
  * */
 
+/**
+ * Controller to manage sev2token for users that authenticate against Smart Explorer with oAuth2.0
+ * */
+
 @RestController
 @RequestMapping("/api/v2/token")
 public class TokenEstablishController {

@@ -37,6 +37,7 @@ public class MainTokenManager implements TokenManager {
                     "User just exist in database so it is impossible to create new same account.");
         }
 
+        log.info("Building token for " + establishData.getUsername());
         AbstractSev2Token token = tokenGenerator.generateToken(userIdGenerator.generateId(establishData.getUsername()),
                 establishData.getUsername(), establishData.getIpAddress());
 

@@ -2,6 +2,7 @@ package pl.smartexplorer.cerber.dto;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Data;
+import pl.smartexplorer.cerber.model.user.User;
 
 /**
  * @author
@@ -15,4 +16,5 @@ public class CerberAuthDecission {
     private boolean decision;
     private String sev2token;
     private String message;
+    private User user;
 }

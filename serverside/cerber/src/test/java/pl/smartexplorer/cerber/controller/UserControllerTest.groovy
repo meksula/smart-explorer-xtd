@@ -1,16 +1,23 @@
 package pl.smartexplorer.cerber.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.web.util.NestedServletException
+import pl.smartexplorer.cerber.dto.TokenEstablishData
 import pl.smartexplorer.cerber.dto.UserRequest
 import pl.smartexplorer.cerber.model.user.AuthenticationType
 import pl.smartexplorer.cerber.model.user.User
+import pl.smartexplorer.cerber.repository.ExpirableTokenRepository
+import pl.smartexplorer.cerber.repository.TokenRepository
 import pl.smartexplorer.cerber.repository.UserRepository
+import pl.smartexplorer.cerber.security.TokenManager
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -18,6 +25,7 @@ import java.time.LocalDateTime
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 
 /**
  * @author
@@ -25,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 27-10-2018
  * */
 
+@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserControllerTest extends Specification {
@@ -38,12 +47,23 @@ class UserControllerTest extends Specification {
     @Autowired
     protected UserRepository userRepository
 
+    @Autowired
+    protected TokenManager tokenManager
+
+    @Autowired
+    protected JdbcTemplate jdbcTemplate
+
+    protected TokenRepository tokenRepository
+
     def userRequest = null
     protected User user
     def username = "testuser"
     def password = "password"
+    String requestUserJson = null
 
     def setup() {
+        tokenRepository = new ExpirableTokenRepository(jdbcTemplate)
+
         userRequest = new UserRequest()
         userRequest.setUsername("testuser")
         userRequest.setPassword("password")
@@ -61,13 +81,18 @@ class UserControllerTest extends Specification {
         user.setAccountNonExpired(true)
         user.setCredentialsNonExpired(true)
         user.setEnabled(true)
+
+        requestUserJson = new ObjectMapper().writeValueAsString(userRequest)
     }
 
-    def "controller should return user"() {
+    def "retrieveUser() should return user"() {
+        setup:
+        userRepository.save(user)
+
         when:
         def response = mockMvc.perform(post("/api/v2/user")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(userRequest)))
+                .content(requestUserJson))
 
         then:
         response.andExpect(status().isOk())
@@ -75,20 +100,66 @@ class UserControllerTest extends Specification {
         response.andExpect(jsonPath('$.socialUsername').value('426264179650124'))
     }
 
-    def "controller should NOT return user"() {
+    def "retrieveUser() should NOT return user"() {
         when:
-        def response = mockMvc.perform(post("/api/v2/user")
+        mockMvc.perform(post("/api/v2/user")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(userRequest)))
+                .content(requestUserJson))
+
+        then:
+        thrown(NestedServletException)
+    }
+
+    def "authenticateUserAndReturnDecision should return SUCCESSFULY prepared entity" () {
+        setup:
+        userRepository.save(user)
+        def estData = new TokenEstablishData()
+        estData.setUserId(user.getUserId())
+        estData.setUsername("testuser")
+        estData.setIpAddress("192.29.22.34")
+        log.info(estData.toString())
+        tokenManager.generateTokenAndSave(estData)
+
+        when:
+        def response = mockMvc.perform(post("/api/v2/user/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestUserJson))
 
         then:
         response.andExpect(status().isOk())
-        response.andExpect(jsonPath('$.email').isEmpty())
-        response.andExpect(jsonPath('$.socialUsername').isEmpty())
+        response.andExpect(jsonPath('$.decision').value('true'))
+        response.andExpect(jsonPath('$.sev2token').isNotEmpty())
+        response.andExpect(jsonPath('$.message').isNotEmpty())
+        response.andExpect(jsonPath('$.user').isNotEmpty())
+
+        cleanup:
+        tokenRepository.dropTable()
+    }
+
+    def "authenticateUserAndReturnDecision should return USER but token generate is FAILED test"() {
+        setup:
+        userRepository.save(user)
+        def estData = new TokenEstablishData()
+        estData.setUserId(user.getUserId())
+        estData.setUsername("testuser")
+        estData.setIpAddress("192.29.22.34")
+
+        when:
+        def response = mockMvc.perform(post("/api/v2/user/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestUserJson)).andDo(print())
+
+        then:
+        response.andExpect(status().isOk())
+        response.andExpect(jsonPath('$.decision').value('false'))
+        response.andExpect(jsonPath('$.sev2token').isEmpty())
+        response.andExpect(jsonPath('$.message').value('User retrieved successfully but some error occured while sev2token update'))
+        response.andExpect(jsonPath('$.user').isNotEmpty())
     }
 
     def cleanup() {
         userRepository.delete(user)
+
     }
 
 }
