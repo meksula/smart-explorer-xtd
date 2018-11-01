@@ -7,22 +7,33 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.ResultActions
+import org.springframework.test.web.servlet.ResultHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.util.NestedServletException
+import pl.smartexplorer.cerber.dto.CerberAuthDecisionRegistration
 import pl.smartexplorer.cerber.dto.TokenEstablishData
 import pl.smartexplorer.cerber.dto.UserRequest
 import pl.smartexplorer.cerber.model.user.AuthenticationType
 import pl.smartexplorer.cerber.model.user.User
 import pl.smartexplorer.cerber.repository.ExpirableTokenRepository
+import pl.smartexplorer.cerber.repository.RegistrationVerifRepository
 import pl.smartexplorer.cerber.repository.TokenRepository
 import pl.smartexplorer.cerber.repository.UserRepository
 import pl.smartexplorer.cerber.security.TokenManager
 import pl.smartexplorer.cerber.services.registration.UserRegistrationModel
+import pl.smartexplorer.cerber.services.registration.UserRegistrator
 import spock.lang.Specification
 
+import javax.xml.ws.Response
 import java.time.LocalDateTime
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -54,6 +65,12 @@ class UserControllerTest extends Specification {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate
+
+    @Autowired
+    protected UserRegistrator userRegistrator
+
+    @Autowired
+    protected RegistrationVerifRepository verifRepository
 
     protected TokenRepository tokenRepository
 
@@ -165,20 +182,74 @@ class UserControllerTest extends Specification {
         def JSON = new ObjectMapper().writeValueAsString(user)
 
         when:
-        def response = mockMvc.perform(put("/api/v2/user/registration")
+        ResultActions response = mockMvc.perform(put("/api/v2/user/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSON))
                 .andDo(print())
 
         then:
         response.andExpect(status().isCreated())
-        response.andExpect(jsonPath('$.userId').isNotEmpty())
-        response.andExpect(jsonPath('$.isEnabled').value('false'))
-        response.andExpect(jsonPath('$.username').value(user.getUsername()))
+        response.andExpect(jsonPath('$.verificationUuid').isNotEmpty())
+        response.andExpect(jsonPath('$.user').isNotEmpty())
+        response.andExpect(jsonPath('$.decision').value('true'))
+        response.andExpect(jsonPath('$.message').value("User was created successfully"))
 
         cleanup:
         tokenRepository.dropTable()
         userRepository.delete(userRepository.findByUsername(user.getUsername()).get())
+    }
+
+    def "verification should processed with SUCCESS - integration test"() {
+        setup:
+        def user = UserRegistrationModel.buildUser()
+        CerberAuthDecisionRegistration cadr = userRegistrator.registerUser(user, "192.33.333.24")
+        def resultBoolean = ""
+
+        when:
+        def response = mockMvc.perform(get("/api/v2/user/registration/verification/" + cadr.getUser().getUserId() + "/" + cadr.getVerificationUuid()))
+
+        response.andDo(new ResultHandler() {
+            @Override
+            void handle(MvcResult result) throws Exception {
+                resultBoolean = result.getResponse().getContentAsString()
+            }
+        })
+
+        then:
+        response.andExpect(status().isOk())
+        assert resultBoolean == "true"
+
+        cleanup:
+        tokenRepository.dropTable()
+        userRepository.delete(userRepository.findByUsername(user.getUsername()).get())
+        verifRepository.deleteAll()
+    }
+
+    def "verification should processed with FAILURE - integration test"() {
+        setup:
+        def user = UserRegistrationModel.buildUser()
+        CerberAuthDecisionRegistration cadr = userRegistrator.registerUser(user, "192.33.333.24")
+        def resultBoolean = ""
+
+        when:'here change correct UUID to invalid'
+        cadr.setVerificationUuid(UUID.randomUUID().toString())
+        def response = mockMvc.perform(get("/api/v2/user/registration/verification/" + cadr.getUser().getUserId() + "/" + cadr.getVerificationUuid()))
+
+        response.andDo(new ResultHandler() {
+            @Override
+            void handle(MvcResult result) throws Exception {
+                resultBoolean = result.getResponse().getContentAsString()
+            }
+        })
+
+        then:
+        response.andExpect(status().isOk())
+        assert resultBoolean == "false"
+
+        cleanup:
+        tokenRepository.dropTable()
+        userRepository.delete(userRepository.findByUsername(user.getUsername()).get())
+        verifRepository.deleteAll()
     }
 
     def cleanup() {

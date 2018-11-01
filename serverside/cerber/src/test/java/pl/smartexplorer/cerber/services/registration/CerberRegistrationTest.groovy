@@ -3,7 +3,7 @@ package pl.smartexplorer.cerber.services.registration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
-import pl.smartexplorer.cerber.model.user.User
+import pl.smartexplorer.cerber.dto.CerberAuthDecisionRegistration
 import pl.smartexplorer.cerber.repository.ExpirableTokenRepository
 import pl.smartexplorer.cerber.repository.TokenRepository
 import pl.smartexplorer.cerber.repository.UserRepository
@@ -29,7 +29,7 @@ class CerberRegistrationTest extends Specification {
 
     private TokenRepository tokenRepository
 
-    private User user
+    private CerberAuthDecisionRegistration cadr
 
     void setup() {
         tokenRepository = new ExpirableTokenRepository(jdbcTemplate)
@@ -38,13 +38,13 @@ class CerberRegistrationTest extends Specification {
     def "save user and token should go correctly"() {
         when:
         def user = UserRegistrationModel.buildUser()
-        this.user = userRegistrator.registerUser(user, "192.393.23.33")
+        this.cadr = userRegistrator.registerUser(user, "192.393.23.33")
 
         then:
-        assert userRepository.findById(this.user.getUserId()).isPresent()
-        assert userRepository.findByUsername(this.user.getUsername()).isPresent()
-        assert tokenRepository.findByUserId(this.user.getUserId()).isPresent()
-        assert tokenRepository.findByUsername(this.user.getUsername()).isPresent()
+        assert userRepository.findById(this.cadr.getUser().getUserId()).isPresent()
+        assert userRepository.findByUsername(this.cadr.getUser().getUsername()).isPresent()
+        assert tokenRepository.findByUserId(this.cadr.getUser().getUserId()).isPresent()
+        assert tokenRepository.findByUsername(this.cadr.getUser().getUsername()).isPresent()
     }
 
     def "[IDEMPOTENT METHOD TEST] save user and token should BE FAILED because just exist in database"() {
@@ -53,11 +53,13 @@ class CerberRegistrationTest extends Specification {
         def firstIterationUserId = ""
         def otherIterationsUserIds = []
         for (int i = 0; i <= 4; i++) {
-            this.user = userRegistrator.registerUser(user, "192.393.23.33")
+            def tmp = userRegistrator.registerUser(user, "192.393.23.33").getUser()
+            this.cadr = new CerberAuthDecisionRegistration()
+            this.cadr.setUser(tmp)
             if (i == 0)
-                firstIterationUserId = this.user.getUserId()
+                firstIterationUserId = this.cadr.getUser().getUserId()
             else
-                otherIterationsUserIds.add(this.user.getUserId())
+                otherIterationsUserIds.add(this.cadr.getUser().getUserId())
         }
 
         then: "user did not saved to database so userId didn't assign"
@@ -69,8 +71,8 @@ class CerberRegistrationTest extends Specification {
     }
 
     void cleanup() {
-        if (user != null)
-            userRepository.delete(user)
+        if (this.cadr != null)
+            userRepository.delete(this.cadr.getUser())
 
         tokenRepository.dropTable()
     }

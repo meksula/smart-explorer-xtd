@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import pl.smartexplorer.cerber.dto.CerberAuthDecisionRegistration;
 import pl.smartexplorer.cerber.dto.CerberAuthDecission;
 import pl.smartexplorer.cerber.dto.UserRequest;
 import pl.smartexplorer.cerber.model.user.User;
@@ -43,14 +44,20 @@ public class UserController {
      * */
     @PutMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public User registerUser(@RequestBody User user, HttpServletRequest request) {
+    public CerberAuthDecisionRegistration registerUser(@RequestBody User user, HttpServletRequest request) {
         return userRegistrator.registerUser(user, request.getRemoteAddr());
     }
 
-    @GetMapping("/registration/verification/{uuid}")
+    /**
+     * User can verify his registration by click to generated link in posted mail.
+     * @param userId
+     *      and
+     * @param verifUuid are sending with confirmation email.
+     * */
+    @GetMapping("/registration/verification/{userId}/{verifUuid}")
     @ResponseStatus(HttpStatus.OK)
-    public void registrationVerification(@PathVariable String uuid) {
-        //TODO
+    public boolean registrationVerification(@PathVariable String userId, @PathVariable String verifUuid) {
+        return userRegistrator.verifyRegistration(userId, verifUuid);
     }
 
 }

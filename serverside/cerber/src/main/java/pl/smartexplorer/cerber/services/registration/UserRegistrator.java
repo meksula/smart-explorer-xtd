@@ -1,6 +1,7 @@
 package pl.smartexplorer.cerber.services.registration;
 
 import lombok.extern.slf4j.Slf4j;
+import pl.smartexplorer.cerber.dto.CerberAuthDecisionRegistration;
 import pl.smartexplorer.cerber.dto.TokenEstablishData;
 import pl.smartexplorer.cerber.model.user.User;
 import pl.smartexplorer.cerber.repository.TokenRepository;
@@ -14,7 +15,7 @@ import pl.smartexplorer.cerber.validators.classes.UserRegistrationValidator;
  * */
 
 @Slf4j
-public abstract class UserRegistrator {
+public abstract class UserRegistrator implements RegistrationVerificator {
     private UserRegistrationValidator validator;
     private UserRepository userRepository;
 
@@ -24,19 +25,25 @@ public abstract class UserRegistrator {
     }
 
     protected abstract String generateToken(TokenEstablishData buildTokenEstablishData);
+    protected abstract String getSev2Token();
+    protected abstract String initVerificationUiid();
 
-    public User registerUser(User user, String ipAddress) {
+    public CerberAuthDecisionRegistration registerUser(User user, String ipAddress) {
         boolean flag = validator.isAbleToRegister(user);
 
         if (!flag) {
-            log.error("Validator not allow to create new user. User with same, identical username : "
-                    + user.getUsername() + " just exist in database.");
-            return user;
+            final String MSG = "Validator not allow to create new user. User with same, identical username :" +
+                                user.getUsername() + " just exist in database.";
+            log.error(MSG);
+
+            return buildDecisionRegistration(user, false, MSG, null, null);
         }
 
         String userId = generateToken(buildTokenEstablishData(user.getUsername(), ipAddress));
         user.setUserId(userId);
-        return saveUser(user);
+        User updatedUser = saveUser(user);
+        return buildDecisionRegistration(updatedUser, true,
+                "User was created successfully", getSev2Token(), initVerificationUiid());
     }
 
     private TokenEstablishData buildTokenEstablishData(String username, String ipAddress) {
@@ -53,6 +60,17 @@ public abstract class UserRegistrator {
         }
 
         return this.userRepository.save(user);
+    }
+
+    private CerberAuthDecisionRegistration buildDecisionRegistration(User user, boolean decission, String message,
+                                                                     String sev2token, String verificationUiid) {
+        CerberAuthDecisionRegistration cadr = new CerberAuthDecisionRegistration();
+        cadr.setUser(user);
+        cadr.setDecision(decission);
+        cadr.setMessage(message);
+        cadr.setSev2token(sev2token);
+        cadr.setVerificationUuid(verificationUiid);
+        return cadr;
     }
 
 }
