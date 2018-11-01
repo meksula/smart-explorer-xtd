@@ -11,9 +11,7 @@ import pl.smartexplorer.cerber.security.TokenManager;
  * @author
  * Karol Meksuła
  * 22-10-2018
- * */
-
-/**
+ *
  * Controller to manage sev2token for users that authenticate against Smart Explorer with oAuth2.0
  * */
 

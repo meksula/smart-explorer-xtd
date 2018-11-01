@@ -18,11 +18,13 @@ import pl.smartexplorer.cerber.repository.ExpirableTokenRepository
 import pl.smartexplorer.cerber.repository.TokenRepository
 import pl.smartexplorer.cerber.repository.UserRepository
 import pl.smartexplorer.cerber.security.TokenManager
+import pl.smartexplorer.cerber.services.registration.UserRegistrationModel
 import spock.lang.Specification
 
 import java.time.LocalDateTime
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -69,7 +71,7 @@ class UserControllerTest extends Specification {
         userRequest.setPassword("password")
 
         user = new User()
-        user.setUserId("93kd932d4")
+        user.setUserId("januSnHKdM")
         user.setAuthenticationType(AuthenticationType.SCRIBE.name())
         user.setSocialServiceId("203kd32d023")
         user.setSocialUsername("426264179650124")
@@ -157,9 +159,30 @@ class UserControllerTest extends Specification {
         response.andExpect(jsonPath('$.user').isNotEmpty())
     }
 
+    def "registerUser should register user with SUCCESS"() {
+        given:
+        def user = UserRegistrationModel.buildUser()
+        def JSON = new ObjectMapper().writeValueAsString(user)
+
+        when:
+        def response = mockMvc.perform(put("/api/v2/user/registration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSON))
+                .andDo(print())
+
+        then:
+        response.andExpect(status().isCreated())
+        response.andExpect(jsonPath('$.userId').isNotEmpty())
+        response.andExpect(jsonPath('$.isEnabled').value('false'))
+        response.andExpect(jsonPath('$.username').value(user.getUsername()))
+
+        cleanup:
+        tokenRepository.dropTable()
+        userRepository.delete(userRepository.findByUsername(user.getUsername()).get())
+    }
+
     def cleanup() {
         userRepository.delete(user)
-
     }
 
 }
