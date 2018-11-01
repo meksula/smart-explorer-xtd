@@ -6,10 +6,10 @@ package pl.smartexplorer.scribe.exception;
  * 20-10-2018
  * */
 
-public class ScribeException extends RuntimeException {
+public class ScribeAuthenticationException extends RuntimeException {
     private String message;
 
-    public ScribeException(final String message) {
+    public ScribeAuthenticationException(final String message) {
         this.message = message;
     }
 

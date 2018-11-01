@@ -33,9 +33,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         CerberAuthDecission cerberAuthDecission = (CerberAuthDecission) userDetailsService.loadUserByUsernameAndPassword(authentication.getName(),
                 authentication.getCredentials().toString());
 
-        User user = cerberAuthDecission.getUser();
+        if (cerberAuthDecission.getUser() == null) {
+            log.info("Some inner error occured. User is null.");
+            return null;
+        }
 
+        User user = cerberAuthDecission.getUser();
         log.info("Authentication successful.");
+
         return new CustomAuthentication() {
             @Override
             public String getSev2token() {
