@@ -1,6 +1,7 @@
 package pl.smartexplorer.scribe.core.auth;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class CerberTokenReceiver implements TokenReceiver {
     private RestTemplate restTemplate;
+
+    @Value("${registration.url}")
+    private String registrationUrl;
 
     public CerberTokenReceiver() {
         this.restTemplate = new RestTemplate();
@@ -40,11 +44,14 @@ public class CerberTokenReceiver implements TokenReceiver {
             log.info(msg);
             return msg;
         } else {
-            httpServletResponse.addHeader("sev2token", cerberAuthDecission.getSev2token());
-            if (cerberAuthDecission.isDecision())
+            if (cerberAuthDecission.isDecision()) {
+                httpServletResponse.addHeader("sev2token", cerberAuthDecission.getSev2token());
                 log.info("Authentication process was successful.");
-            else
-                log.error("Authentication failed from unrecognized reasons.");
+            }
+            else {
+                log.error("Authentication failed from unrecognized reasons. Probably user hasn't account in our service.");
+                return registrationUrl;
+            }
 
             return cerberAuthDecission.getMessage();
         }
