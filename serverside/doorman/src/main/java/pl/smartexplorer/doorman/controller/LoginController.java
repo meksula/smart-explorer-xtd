@@ -43,13 +43,21 @@ public class LoginController {
     public void loginFacebook(HttpServletResponse response, HttpServletRequest request, Authentication authentication) throws IOException {
 
         if (authentication.isAuthenticated()) {
-            log.info("Logged successfully by facebook oAuth 2.0");
             String[] tokenParams = authTokenRequest(authentication, request);
-            response.addHeader(tokenParams[0], tokenParams[1]);
-            log.info("Builder header: " + tokenParams[0] + ", " + tokenParams[1]);
-            response.sendRedirect("http://localhost:8080");
+
+            if (tokenParams[2].contains(":8030")) {
+                final String REGISTRATION = tokenParams[2];
+                log.info("User try to login, but has not account. Transferring to " + tokenParams[2]);
+                response.sendRedirect(REGISTRATION);
+            } else {
+                response.addHeader(tokenParams[0], tokenParams[1]);
+                log.info("Builder header: " + tokenParams[0] + ", " + tokenParams[1]);
+                log.info("Logged successfully by facebook oAuth 2.0");
+                response.sendRedirect("http://localhost:8080");
+            }
         } else {
             log.info("oAuth authentication failed.");
+            response.sendRedirect("http://localhost:8010/login/error");
         }
     }
 
@@ -71,7 +79,7 @@ public class LoginController {
         ResponseEntity<String> authEntity = restTemplate.postForEntity("http://localhost:8030/api/v2/auth", tokenEstablishData, String.class);
         log.info("Response authorization from Scribe: [" + authEntity.getBody() + "]");
         log.info("Received sev2token: " + String.valueOf(authEntity.getHeaders().get("sev2token")));
-        return new String[] {"sev2token", String.valueOf(authEntity.getHeaders().get("sev2token"))};
+        return new String[] {"sev2token", String.valueOf(authEntity.getHeaders().get("sev2token")), authEntity.getBody()};
     }
 
     private TokenEstablishData createTokenEstablishData(Authentication authentication, HttpServletRequest request) {

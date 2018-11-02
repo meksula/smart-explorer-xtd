@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rejestracja</title>
+</head>
+<body>
+    <h1>Rejestracja przez Facebooka</h1>
+
+    <form action="#" th:action="@{/registration/fb}" th:object="${registration}" method="post">
+        <table>
+            <tr>
+                <select th:field="*{authenticationType}">
+                    <option value="FACEBOOK">Facebook</option>
+                </select>
+            </tr>
+            <tr>
+                <td>Adres email:</td>
+                <td><input type="text" th:field="*{email}" /></td>
+                <td th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Mail error</td>
+            </tr>
+            <tr>
+                <td>Hasło:</td>
+                <td><input type="password" th:field="*{password}" /></td>
+                <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</td>
+            </tr>
+            <tr>
+                <td>Powtórz hasło:</td>
+                <td><input type="password" th:field="*{passwordRepeated}" /></td>
+                <td th:if="${#fields.hasErrors('passwordRepeated')}" th:errors="*{passwordRepeated}">Password error</td>
+            </tr>
+            <tr>
+                <td><button type="submit">Submit</button></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
