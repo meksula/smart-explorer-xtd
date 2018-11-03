@@ -22,7 +22,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Registration {
-    public static final String REGEX = "^[a-zA-Z0-9]{6,40}$";
+    public static final String REGEX = "^[a-zA-Z0-9łóżźćńę\\s]{6,40}$";
     public static final String PASSWORD = "^[a-zA-Z0-9,./?'!@#$%^&*()_\\-+=]{7,30}$";
     public static final String PASSWORD_MSG = "Hasło musi skladać się minimum z 7 znaków (Bez znaków polskich)";
     public static final String NAMES_MSG = "Nazwa musi składać się minimum z 6 znaków, bez znaków polskich i znaków specjalnych";

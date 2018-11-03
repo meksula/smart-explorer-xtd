@@ -1,4 +1,4 @@
-package pl.smartexplorer.scribe.services.mailer;
+package pl.smartexplorer.scribe.services.mailer.producer;
 
 import pl.smartexplorer.scribe.services.mailer.model.MailTarget;
 
@@ -12,11 +12,11 @@ import java.util.Map;
  * This is a main interface of Mailer service module.
  * Every class must implements this interface.
  * */
-public interface Mailer {
+public interface MailerProducer {
     /**
      * @param properties in this map we can put values to display in HTML template
      * */
-    void sendMail(String templateName, MailTarget mailTarget, Map<String, String> properties);
+    boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties);
 
     /**
      * @param template probably HTML template encoded by Base64 for example
