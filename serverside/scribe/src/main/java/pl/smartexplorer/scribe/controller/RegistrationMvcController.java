@@ -32,7 +32,7 @@ import java.io.IOException;
 @AllArgsConstructor
 @Controller
 @RequestMapping("/registration")
-public class RegistrationController {
+public class RegistrationMvcController {
     private RegistrationProcessExecutor<CerberAuthDecisionRegistration, Registration> registrationProcessExecutor;
 
     @GetMapping

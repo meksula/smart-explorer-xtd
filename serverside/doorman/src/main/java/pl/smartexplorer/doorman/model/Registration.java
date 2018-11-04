@@ -40,6 +40,7 @@ public class Registration {
     @Pattern(regexp = REGEX, message = NAMES_MSG)
     private String socialUsername;
 
+    @NotNull
     @Pattern(regexp = REGEX, message = NAMES_MSG)
     private String username;
 

@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static java.util.Objects.isNull;
+
 /**
  * @author
  * Karol Meksuła
@@ -34,7 +36,6 @@ public class LoginController {
     @GetMapping("/option")
     @ResponseStatus(HttpStatus.OK)
     public String login() {
-        log.info("Login option page.");
         return "login";
     }
 
@@ -45,10 +46,12 @@ public class LoginController {
         if (authentication.isAuthenticated()) {
             String[] tokenParams = authTokenRequest(authentication, request);
 
-            if (tokenParams[2].contains(":8030")) {
+            if (!isNull(tokenParams) && tokenParams[2].contains(":8030")) {
                 final String REGISTRATION = tokenParams[2];
                 log.info("User try to login, but has not account. Transferring to " + tokenParams[2]);
                 response.sendRedirect(REGISTRATION);
+            } else if (isNull(tokenParams)) {
+                log.info("Login attempt was failed.");
             } else {
                 response.addHeader(tokenParams[0], tokenParams[1]);
                 log.info("Builder header: " + tokenParams[0] + ", " + tokenParams[1]);
@@ -76,7 +79,14 @@ public class LoginController {
 
     private String[] authTokenRequest(Authentication authentication, HttpServletRequest request) {
         TokenEstablishData tokenEstablishData = createTokenEstablishData(authentication, request);
-        ResponseEntity<String> authEntity = restTemplate.postForEntity("http://localhost:8030/api/v2/auth", tokenEstablishData, String.class);
+        ResponseEntity<String> authEntity;
+        try {
+            authEntity = restTemplate.postForEntity("http://localhost:8030/api/v2/auth", tokenEstablishData, String.class);
+        } catch (Exception ex) {
+            log.info("Cannot connect to Scribe service. Please check connection!");
+            return null;
+        }
+
         log.info("Response authorization from Scribe: [" + authEntity.getBody() + "]");
         log.info("Received sev2token: " + String.valueOf(authEntity.getHeaders().get("sev2token")));
         return new String[] {"sev2token", String.valueOf(authEntity.getHeaders().get("sev2token")), authEntity.getBody()};

@@ -15,6 +15,11 @@
                 </select>
             </tr>
             <tr>
+                <td>Nazwa użytkownika:</td>
+                <td><input type="text" th:field="*{socialUsername}" /></td>
+                <td th:if="${#fields.hasErrors('socialUsername')}" th:errors="*{socialUsername}">SocialUsername error</td>
+            </tr>
+            <tr>
                 <td>Adres email:</td>
                 <td><input type="text" th:field="*{email}" /></td>
                 <td th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Mail error</td>
