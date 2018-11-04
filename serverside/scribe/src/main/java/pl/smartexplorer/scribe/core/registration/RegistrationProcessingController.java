@@ -33,7 +33,7 @@ public class RegistrationProcessingController {
     public CerberAuthDecisionRegistration buildAndSendToDatabase(@Valid @RequestBody Registration registration) {
         if (!PasswordValidator.validPassword(registration.getPassword(), registration.getPasswordRepeated())) {
             CerberAuthDecisionRegistration cadr = new CerberAuthDecisionRegistration();
-            cadr.setMessage("Hasła nie są identyczne.");
+            cadr.setMessage("A both passwords are not identical.");
             log.info("The both password are not identical.");
         }
 

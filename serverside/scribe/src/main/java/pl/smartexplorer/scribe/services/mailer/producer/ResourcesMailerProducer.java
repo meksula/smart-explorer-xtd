@@ -13,7 +13,7 @@ import java.util.Map;
  * */
 
 public abstract class ResourcesMailerProducer implements MailerProducer {
-    public String pathToTemplates;
-
     protected abstract Object prepareModel(Map<String, String> properties);
+
+    public abstract String getResourcesPath();
 }

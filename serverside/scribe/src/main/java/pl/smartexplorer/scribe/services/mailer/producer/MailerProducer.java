@@ -9,8 +9,9 @@ import java.util.Map;
  * Karol Meksuła
  * 01-11-2018
  *
- * This is a main interface of Mailer service module.
- * Every class must implements this interface.
+ * This is a one of main interfaces of Mailer service module.
+ * This interface represents each Mail Producer at mailing service.
+ * Each mail is pushes to queue and next consumes by MailerConsumer.
  * */
 public interface MailerProducer {
     /**
@@ -21,6 +22,6 @@ public interface MailerProducer {
     /**
      * @param template probably HTML template encoded by Base64 for example
      * */
-    Map<String, String> addTemplate(String template);
+    boolean addTemplate(String template, String templateName);
 }
 
