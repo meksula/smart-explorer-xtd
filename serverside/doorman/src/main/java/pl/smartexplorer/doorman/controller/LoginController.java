@@ -25,7 +25,7 @@ import static java.util.Objects.isNull;
 
 @Slf4j
 @Controller
-@RequestMapping("/login")
+@RequestMapping
 public class LoginController {
     private RestTemplate restTemplate;
 
@@ -33,13 +33,13 @@ public class LoginController {
         this.restTemplate = new RestTemplate();
     }
 
-    @GetMapping("/option")
+    @GetMapping("/login/option")
     @ResponseStatus(HttpStatus.OK)
     public String login() {
-        return "login";
+        return "login_choose";
     }
 
-    @GetMapping("/facebook")
+    @GetMapping("/secured/facebook")
     @ResponseStatus(HttpStatus.OK)
     public void loginFacebook(HttpServletResponse response, HttpServletRequest request, Authentication authentication) throws IOException {
 
@@ -64,14 +64,14 @@ public class LoginController {
         }
     }
 
-    @GetMapping("/scribe")
+    @GetMapping("/login/scribe")
     @ResponseStatus(HttpStatus.OK)
     public void loginScribe(HttpServletResponse response) throws IOException {
         log.debug("Redirect to Scribe");
         response.sendRedirect("http://localhost:8030/login");
     }
 
-    @GetMapping("/error")
+    @GetMapping("/login/error")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String loginError() {
         return "login_error";

@@ -7,6 +7,8 @@
 <body>
     <h1>Rejestracja przez Facebooka</h1>
 
+    <p>Jeśli chcesz się zarejestrować, aby później używać Loginu i hasła do logowania, <a th:href="@{/registration}">kliknij tutaj</a></p>
+
     <form action="#" th:action="@{/registration/fb}" th:object="${registration}" method="post">
         <table>
             <tr>

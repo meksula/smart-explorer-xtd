@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 /**
  * @author
  * Karol Meksuła
@@ -21,8 +18,8 @@ public class MenuController {
 
     @GetMapping("/join")
     @ResponseStatus(HttpStatus.OK)
-    public void join(HttpServletResponse response) throws IOException {
-        response.sendRedirect("http://localhost:8030/registration");
+    public String join() {
+        return "registration_choose";
     }
 
     @GetMapping("/about")
