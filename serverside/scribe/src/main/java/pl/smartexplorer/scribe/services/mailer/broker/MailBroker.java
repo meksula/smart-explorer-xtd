@@ -1,5 +1,7 @@
 package pl.smartexplorer.scribe.services.mailer.broker;
 
+import org.springframework.amqp.core.Queue;
+
 /**
  * @author
  * Karol Meksuła
@@ -7,4 +9,5 @@ package pl.smartexplorer.scribe.services.mailer.broker;
  * */
 
 public interface MailBroker {
+    Queue getQueue();
 }

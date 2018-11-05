@@ -16,6 +16,9 @@ import java.util.Map;
 public interface MailerProducer {
     /**
      * @param properties in this map we can put values to display in HTML template
+     * If you want to use default template from embedded, builded-in asset then simply type name of this file,
+     * but if you want to use CUSTOM template from directory on local machine, then type name of template,
+     * but at first type '*' sign. This is indicator for MailerProducer that it should use custom template.
      * */
     boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties);
 

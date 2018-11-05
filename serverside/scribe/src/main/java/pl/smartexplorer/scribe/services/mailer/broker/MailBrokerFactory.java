@@ -3,6 +3,8 @@ package pl.smartexplorer.scribe.services.mailer.broker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import pl.smartexplorer.scribe.services.mailer.broker.spec.RabbitMailBroker;
+import pl.smartexplorer.scribe.services.mailer.broker.spec.SimpleMailBroker;
 
 /**
  * @author

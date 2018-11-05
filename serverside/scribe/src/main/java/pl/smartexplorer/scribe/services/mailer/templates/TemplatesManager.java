@@ -22,10 +22,10 @@ public abstract class TemplatesManager {
     /**
      * This method can be use to load mail template encoded by Base64 algorithm.
      * */
-    public abstract String loadTemplateBased64(String templateName);
+    public abstract byte[] loadTemplateBased64(String templateName);
 
     /**
      * This method is able to load template directly from file, for example XML or HTML.
      * */
-    public abstract String loadTemplatePlain(String templateName);
+    public abstract byte[] loadTemplatePlain(String templateName);
 }
