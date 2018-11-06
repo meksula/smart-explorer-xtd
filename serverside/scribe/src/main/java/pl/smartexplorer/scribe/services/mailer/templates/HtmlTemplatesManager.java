@@ -1,17 +1,28 @@
 package pl.smartexplorer.scribe.services.mailer.templates;
 
+import lombok.extern.slf4j.Slf4j;
+import pl.smartexplorer.scribe.services.mailer.templates.injector.HtmlTemplateInjector;
+import pl.smartexplorer.scribe.services.mailer.templates.injector.TemplatesInjector;
+
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
 
 /**
  * @author
  * Karol Meksuła
- * 04-11-2018
+ * 06-11-2018
  * */
 
+@Slf4j
 public class HtmlTemplatesManager extends TemplatesManager {
+    private TemplatesInjector injector;
 
     public HtmlTemplatesManager(String pathToTemplates) {
         super(pathToTemplates);
+        this.injector = new HtmlTemplateInjector();
     }
 
     @Override
@@ -25,43 +36,22 @@ public class HtmlTemplatesManager extends TemplatesManager {
     }
 
     @Override
-    public byte[] loadTemplatePlain(String templateName) {
-        String tmp = "<!DOCTYPE html>\n" +
-                "<html xmlns:th=\"http://www.thymeleaf.org\">\n" +
-                "<head>\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "    <title>Login</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<html xmlns:th=\"http://www.thymeleaf.org\">\n" +
-                "\n" +
-                "<body>\n" +
-                "<div th:fragment=\"content\">\n" +
-                "    <form name=\"f\" th:action=\"@{/login}\" method=\"post\">\n" +
-                "        <fieldset>\n" +
-                "            <legend>Please Login</legend>\n" +
-                "            <div th:if=\"${param.error}\" class=\"alert alert-error\">\n" +
-                "                Invalid username and password.\n" +
-                "            </div>\n" +
-                "            <div th:if=\"${param.logout}\" class=\"alert alert-success\">\n" +
-                "                You have been logged out.\n" +
-                "            </div>\n" +
-                "            <label for=\"username\">Username</label>\n" +
-                "            <input type=\"text\" id=\"username\" name=\"username\"/>\n" +
-                "            <label for=\"password\">Password</label>\n" +
-                "            <input type=\"password\" id=\"password\" name=\"password\"/>\n" +
-                "            <div class=\"form-actions\">\n" +
-                "                <button type=\"submit\" class=\"btn\">Log in</button>\n" +
-                "            </div>\n" +
-                "        </fieldset>\n" +
-                "    </form>\n" +
-                "</div>\n" +
-                "</body>\n" +
-                "</html>\n" +
-                "</body>\n" +
-                "</html>";
+    public byte[] loadTemplatePlain(final String templateName) {
+        String template = "";
 
-        return tmp.getBytes(Charset.forName("UTF-8"));
+        return template.getBytes(Charset.forName("UTF-8"));
+    }
+
+    @Override
+    public byte[] loadTemplateAndInjectProperties(final String templatePath, final Map<String, String> properties) {
+        try {
+            String htmlTemplate = String.join("\n", Files.readAllLines(Paths.get(templatePath)));
+            return injector.injectSingle(htmlTemplate, properties);
+        } catch (IOException e) {
+            log.error("Cannot read file from path: " + templatePath);
+            return new byte[0];
+        }
+
     }
 
 }

@@ -10,6 +10,7 @@ import org.thymeleaf.context.Context;
 import pl.smartexplorer.scribe.services.mailer.broker.MailBroker;
 import pl.smartexplorer.scribe.services.mailer.broker.MailBrokerFactory;
 import pl.smartexplorer.scribe.services.mailer.model.MailTarget;
+import pl.smartexplorer.scribe.services.mailer.model.TemplateEncoded;
 import pl.smartexplorer.scribe.services.mailer.producer.ResourcesMailerProducer;
 import pl.smartexplorer.scribe.services.mailer.templates.HtmlTemplatesManager;
 import pl.smartexplorer.scribe.services.mailer.templates.TemplatesManager;
@@ -48,21 +49,24 @@ public class ThymeleafResourcesMailer extends ResourcesMailerProducer {
     @Override
     public boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties) {
         final String pathToTemplate = pathNegotiate(templateName);
-        String templateEncoded = encodeTemplate(pathToTemplate);
+        String templateEncoded = prepareTemplate(pathToTemplate, properties);
 
         if (!isNull(mailTarget.getTargetEmail())) {
             try {
-                rabbitTemplate.convertAndSend(mailBroker.getQueue().getName(), writeAsJson(templateEncoded, mailTarget, properties));
+                final String payload = writeAsJson(new TemplateEncoded(templateEncoded), mailTarget, properties);
+                rabbitTemplate.convertAndSend(mailBroker.getQueue().getName(), payload);
             } catch (JsonProcessingException e) {
                 log.error("Cannot send message to broker because cannot parse objects to JSON = " + e.getClass());
+            } catch (Exception e) {
+                log.error("Some connection error with Message Broker");
             }
 
-            log.info("Mail pushed to queue and now waiting for send to target.");
+            log.info("Mail pushed to queue and now waiting for send to target");
             return true;
         }
 
         log.info("Some values are not initialized or occured some other error while data to send mail was processing " +
-                "and preparing to send.");
+                "and preparing to send");
         return false;
     }
 
@@ -89,18 +93,14 @@ public class ThymeleafResourcesMailer extends ResourcesMailerProducer {
         else return templateName;
     }
 
-    private String encodeTemplate(final String pathToTemplate) {
-        byte[] templateBytes = loadTemplate(pathToTemplate);
+    private String prepareTemplate(final String pathToTemplate, final Map<String, String> properties) {
+        byte[] templateBytes = templatesManager.loadTemplateAndInjectProperties(pathToTemplate, properties);
         return Base64.getEncoder().encodeToString(templateBytes);
     }
 
-    private byte[] loadTemplate(final String pathToTemplate) {
-        return templatesManager.loadTemplatePlain(pathToTemplate);
-    }
-
-    private String writeAsJson(final String templateEncoded, MailTarget mailTarget, Map<String, String> properties) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(
-                Collections.unmodifiableList(Arrays.asList(templateEncoded, mailTarget, properties)));
+    private String writeAsJson(final TemplateEncoded templateEncoded, MailTarget mailTarget, Map<String, String> properties)
+            throws JsonProcessingException {
+        return objectMapper.writeValueAsString(Collections.unmodifiableList(Arrays.asList(templateEncoded, mailTarget, properties)));
     }
 
 }

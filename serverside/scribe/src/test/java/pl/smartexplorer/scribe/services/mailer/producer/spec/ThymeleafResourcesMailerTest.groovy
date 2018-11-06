@@ -35,8 +35,11 @@ class ThymeleafResourcesMailerTest extends Specification {
         props.put("token", "32dm32dm3209dm3209md902d9239d290d,32d2")
         props.put("year", "2018")
 
-        expect:
+        when:
         mailer.putToQueue("template name etc...", mailTarget, props)
+
+        then:
+        noExceptionThrown()
     }
 
 }

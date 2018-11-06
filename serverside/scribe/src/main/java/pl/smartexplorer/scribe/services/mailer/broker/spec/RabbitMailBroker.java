@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import pl.smartexplorer.scribe.services.mailer.broker.MailBroker;
 import org.springframework.amqp.core.Queue;
 
-
 /**
  * @author
  * Karol Meksuła
@@ -15,7 +14,7 @@ import org.springframework.amqp.core.Queue;
 @Getter
 @Slf4j
 public class RabbitMailBroker implements MailBroker {
-    private final String QUEUE_NAME = "smartexplorer-mailing";
+    public static final String QUEUE_NAME = "smartexplorer-mailing";
     private Queue queue;
 
     public RabbitMailBroker() {

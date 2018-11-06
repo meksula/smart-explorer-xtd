@@ -1,5 +1,7 @@
 package pl.smartexplorer.scribe.services.mailer.templates;
 
+import java.util.Map;
+
 /**
  * @author
  * Karol Meksuła
@@ -28,4 +30,6 @@ public abstract class TemplatesManager {
      * This method is able to load template directly from file, for example XML or HTML.
      * */
     public abstract byte[] loadTemplatePlain(String templateName);
+
+    public abstract byte[] loadTemplateAndInjectProperties(String templateName, Map<String, String> properties);
 }

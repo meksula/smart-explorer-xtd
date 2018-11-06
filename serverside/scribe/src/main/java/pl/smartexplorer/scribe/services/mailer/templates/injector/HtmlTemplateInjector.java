@@ -1,0 +1,66 @@
+package pl.smartexplorer.scribe.services.mailer.templates.injector;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.Objects.isNull;
+
+/**
+ * @author
+ * Karol Meksuła
+ * 06-11-2018
+ * */
+
+@Slf4j
+public class HtmlTemplateInjector implements TemplatesInjector {
+    private static final String VALUE = "\\{\\{.+\\}\\}";
+
+    @Override
+    public byte[] injectSingle(String templatePlainHtml, Map<String, String> properties) {
+        if (isNull(templatePlainHtml)) {
+            final String MSG = "Warn! Found replaceable variable amount are not equivalent with properties size!";
+            log.info(MSG);
+            throw new IllegalArgumentException(MSG);
+        }
+
+        String result = templatePlainHtml;
+        List<String> matches = matches(templatePlainHtml);
+
+        if (matches.size() != properties.size()) {
+            log.info("Warn! Found replaceable variable amount are not equivalent with properties size!");
+        }
+
+        for (String var : matches) {
+            String key = var.substring(2, var.length() - 2);
+            String value = properties.get(key);
+
+            if (value == null) {
+                continue;
+            }
+            else {
+                result = result.replace(var, value);
+            }
+        }
+
+        return result.getBytes(Charset.forName("UTF-8"));
+    }
+
+    private List<String> matches(final String templatePlainHtml) {
+        Pattern pattern = Pattern.compile(VALUE);
+        Matcher matcher = pattern.matcher(templatePlainHtml);
+        List<String> values = new ArrayList<>();
+
+        while (matcher.find()) {
+            values.add(matcher.group());
+        }
+
+        return values;
+    }
+
+}
