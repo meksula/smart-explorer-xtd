@@ -68,4 +68,20 @@ class HtmlTemplateInjectorTest extends Specification {
         thrown(IllegalArgumentException.class)
     }
 
+    def "should correctly return list of properties to inject"() {
+        setup:
+        String resource = this.getClass().getResource( '/templates/mail/test.html' ).text
+        Map map = injector.listAllRequiredProperties(resource)
+
+        expect:
+        map.size() == 3
+        assert name.getClass() == className
+
+        where:
+        name       | className
+        'username' | String.class
+        'date'     | String.class
+        'debt'     | String.class
+    }
+
 }

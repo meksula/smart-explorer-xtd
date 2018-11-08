@@ -32,4 +32,6 @@ public abstract class TemplatesManager {
     public abstract byte[] loadTemplatePlain(String templateName);
 
     public abstract byte[] loadTemplateAndInjectProperties(String templateName, Map<String, String> properties);
+
+    public abstract Map<String, Class> listRequiredProperties(String completeTemplatePath);
 }

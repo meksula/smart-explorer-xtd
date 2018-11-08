@@ -3,9 +3,7 @@ package pl.smartexplorer.scribe.services.mailer.templates.injector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +47,17 @@ public class HtmlTemplateInjector implements TemplatesInjector {
         }
 
         return result.getBytes(Charset.forName("UTF-8"));
+    }
+
+    @Override
+    public Map<String, Class> listAllRequiredProperties(String plainTemplate) {
+        Map<String, Class> properties = new HashMap<>();
+        List<String> matchesVar = matches(plainTemplate);
+
+        for (String var : matchesVar)
+            properties.put(var.substring(2, var.length() - 2), var.getClass());
+
+        return Collections.unmodifiableMap(properties);
     }
 
     private List<String> matches(final String templatePlainHtml) {

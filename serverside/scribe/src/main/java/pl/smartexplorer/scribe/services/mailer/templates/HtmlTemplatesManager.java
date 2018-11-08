@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
 
 /**
  * @author
@@ -27,11 +30,13 @@ public class HtmlTemplatesManager extends TemplatesManager {
 
     @Override
     public boolean saveTemplatePlain(String templatePlain, String templateName) {
+        //TODO
         return false;
     }
 
     @Override
     public byte[] loadTemplateBased64(String templateName) {
+        //TODO
         return null;
     }
 
@@ -44,14 +49,34 @@ public class HtmlTemplatesManager extends TemplatesManager {
 
     @Override
     public byte[] loadTemplateAndInjectProperties(final String templatePath, final Map<String, String> properties) {
+        if (isNull(templatePath) || isNull(properties)) {
+            log.error("Cannot load template because one ore more required arguments are null");
+            return new byte[0];
+        }
+
         try {
-            String htmlTemplate = String.join("\n", Files.readAllLines(Paths.get(templatePath)));
+            String htmlTemplate = readStringFromFilePath(templatePath);
             return injector.injectSingle(htmlTemplate, properties);
         } catch (IOException e) {
             log.error("Cannot read file from path: " + templatePath);
             return new byte[0];
         }
 
+    }
+
+    private String readStringFromFilePath(final String pathToTemplate) throws IOException {
+        return String.join("\n", Files.readAllLines(Paths.get(pathToTemplate)));
+    }
+
+    @Override
+    public Map<String, Class> listRequiredProperties(String completeTemplatePath) {
+        try {
+            System.out.println(completeTemplatePath);
+            return injector.listAllRequiredProperties(readStringFromFilePath(completeTemplatePath));
+        } catch (IOException ex) {
+            log.error("It seems that this path is malformed: " + completeTemplatePath);
+            return Collections.emptyMap();
+        }
     }
 
 }

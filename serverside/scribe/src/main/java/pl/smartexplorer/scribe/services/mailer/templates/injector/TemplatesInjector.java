@@ -10,4 +10,6 @@ import java.util.Map;
 
 public interface TemplatesInjector {
     byte[] injectSingle(String templatePlainHtml, Map<String, String> properties);
+
+    Map<String, Class> listAllRequiredProperties(String plainText);
 }

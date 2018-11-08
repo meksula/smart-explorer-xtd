@@ -30,7 +30,7 @@ import static java.util.Objects.isNull;
 
 @Slf4j
 @Service
-public class ThymeleafResourcesMailer extends ResourcesMailerProducer {
+public class HtmlResourcesMailer extends ResourcesMailerProducer {
     private TemplatesManager templatesManager;
     private RabbitTemplate rabbitTemplate;
     private MailBroker mailBroker;
@@ -39,7 +39,7 @@ public class ThymeleafResourcesMailer extends ResourcesMailerProducer {
     @Value("${mail.templates.dir}")
     private String pathToTemplates;
 
-    public ThymeleafResourcesMailer(RabbitTemplate rabbitTemplate, MailBrokerFactory mailBrokerFactory) {
+    public HtmlResourcesMailer(RabbitTemplate rabbitTemplate, MailBrokerFactory mailBrokerFactory) {
         this.templatesManager = new HtmlTemplatesManager(pathToTemplates);
         this.rabbitTemplate = rabbitTemplate;
         this.mailBroker = mailBrokerFactory.mailBroker();
