@@ -20,8 +20,13 @@ public class ResourcesMailConsumer implements MailConsumer {
 
     @RabbitHandler
     @Override
-    public void consume(final String message) {
-        System.out.println("Consumed: " + message);
+    public String consume(final String message) {
+        Cache.lastMessage = message;
+        return message;
+    }
+
+    public static class Cache {
+        public static String lastMessage;
     }
 
 }

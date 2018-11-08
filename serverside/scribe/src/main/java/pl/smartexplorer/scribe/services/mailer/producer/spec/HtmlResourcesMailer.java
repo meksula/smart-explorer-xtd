@@ -87,6 +87,11 @@ public class HtmlResourcesMailer extends ResourcesMailerProducer {
         return pathToTemplates;
     }
 
+    /**
+     * If you enter template name with `*` at first place, this method will resolve template name
+     * from @param String pathToTemplates.
+     * In other case you must enter complete path to template.
+     * */
     private String pathNegotiate(final String templateName) {
         if (templateName.startsWith("*"))
             return pathToTemplates.concat(templateName.substring(1));

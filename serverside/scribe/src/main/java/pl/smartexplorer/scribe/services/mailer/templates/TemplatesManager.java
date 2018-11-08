@@ -19,7 +19,7 @@ public abstract class TemplatesManager {
      * Method can be use to send to server new template from Mailer service Client.
      * This template for example in HTML format should be encoded by Base64 algorithm and sent to server.
      * */
-    public abstract boolean saveTemplatePlain(String templatePlain, String templateName);
+    public abstract boolean saveTemplatePlain(String path, String templatePlain, String templateName);
 
     /**
      * This method can be use to load mail template encoded by Base64 algorithm.

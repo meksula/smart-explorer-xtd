@@ -7,5 +7,5 @@ package pl.smartexplorer.scribe.services.mailer.consumer;
  * */
 
 public interface MailConsumer {
-    void consume(String message);
+    String consume(String message);
 }
