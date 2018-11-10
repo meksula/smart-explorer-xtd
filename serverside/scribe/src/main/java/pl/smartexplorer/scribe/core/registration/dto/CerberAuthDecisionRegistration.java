@@ -14,4 +14,5 @@ import pl.smartexplorer.scribe.model.dto.CerberAuthDecission;
 @Setter
 public class CerberAuthDecisionRegistration extends CerberAuthDecission {
     private String verificationUuid;
+    private String verificationLink;
 }

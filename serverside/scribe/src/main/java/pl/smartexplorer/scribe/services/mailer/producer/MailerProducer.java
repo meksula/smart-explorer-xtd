@@ -20,7 +20,7 @@ public interface MailerProducer {
      * but if you want to use CUSTOM template from directory on local machine, then type name of template,
      * but at first type '*' sign. This is indicator for MailerProducer that it should use custom template.
      * */
-    boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties);
+    boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties) throws RuntimeException;
 
     /**
      * @param template probably HTML template encoded by Base64 for example

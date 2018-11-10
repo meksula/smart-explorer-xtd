@@ -1,7 +1,9 @@
 package pl.smartexplorer.scribe.services.mailer.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.Getter;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author
@@ -9,9 +11,9 @@ import lombok.Getter;
  * 06-11-2018
  * */
 
-@Getter
+@Data
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class TemplateEncoded {
+public class TemplateEncoded implements Serializable {
     private String templateBase64;
 
     public TemplateEncoded(String templateBase64) {

@@ -9,15 +9,14 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import pl.smartexplorer.scribe.services.mailer.broker.MailBroker;
 import pl.smartexplorer.scribe.services.mailer.broker.MailBrokerFactory;
+import pl.smartexplorer.scribe.services.mailer.model.MailPayloadWrapper;
 import pl.smartexplorer.scribe.services.mailer.model.MailTarget;
 import pl.smartexplorer.scribe.services.mailer.model.TemplateEncoded;
 import pl.smartexplorer.scribe.services.mailer.producer.ResourcesMailerProducer;
 import pl.smartexplorer.scribe.services.mailer.templates.HtmlTemplatesManager;
 import pl.smartexplorer.scribe.services.mailer.templates.TemplatesManager;
 
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
@@ -26,7 +25,7 @@ import static java.util.Objects.isNull;
  * @author
  * Karol Meksuła
  * 04-11-2018
- * */
+ */
 
 @Slf4j
 @Service
@@ -47,13 +46,16 @@ public class HtmlResourcesMailer extends ResourcesMailerProducer {
     }
 
     @Override
-    public boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties) {
+    public boolean putToQueue(String templateName, MailTarget mailTarget, Map<String, String> properties) throws RuntimeException {
+        if (isNull(templateName))
+            return false;
+
         final String pathToTemplate = pathNegotiate(templateName);
         String templateEncoded = prepareTemplate(pathToTemplate, properties);
 
-        if (!isNull(mailTarget.getTargetEmail())) {
+        if (!isNull(mailTarget.getTargetEmail()) && templateEncoded.length() > 10) {
             try {
-                final String payload = writeAsJson(new TemplateEncoded(templateEncoded), mailTarget, properties);
+                final String payload = writeAsJson(new MailPayloadWrapper(new TemplateEncoded(templateEncoded), mailTarget));
                 rabbitTemplate.convertAndSend(mailBroker.getQueue().getName(), payload);
             } catch (JsonProcessingException e) {
                 log.error("Cannot send message to broker because cannot parse objects to JSON = " + e.getClass());
@@ -65,14 +67,14 @@ public class HtmlResourcesMailer extends ResourcesMailerProducer {
             return true;
         }
 
-        log.info("Some values are not initialized or occured some other error while data to send mail was processing " +
+        log.error("Some values are not initialized or occured some other error while data to send mail was processing " +
                 "and preparing to send");
         return false;
     }
 
     @Override
     public boolean addTemplate(String template, String templateName) {
-        return templatesManager.saveTemplatePlain(template, templateName);
+        return templatesManager.saveTemplatePlain(this.pathToTemplates, template, templateName);
     }
 
     @Override
@@ -91,11 +93,21 @@ public class HtmlResourcesMailer extends ResourcesMailerProducer {
      * If you enter template name with `*` at first place, this method will resolve template name
      * from @param String pathToTemplates.
      * In other case you must enter complete path to template.
-     * */
+     */
     private String pathNegotiate(final String templateName) {
         if (templateName.startsWith("*"))
             return pathToTemplates.concat(templateName.substring(1));
-        else return templateName;
+
+        String path = "";
+        ClassLoader classLoader = getClass().getClassLoader();
+        try {
+            path = "templates/mail/" + templateName;
+            return classLoader.getResource(path).getPath();
+        } catch (RuntimeException re) {
+            log.error("It was not able to read file from path: " + path);
+            return "";
+        }
+
     }
 
     private String prepareTemplate(final String pathToTemplate, final Map<String, String> properties) {
@@ -103,9 +115,8 @@ public class HtmlResourcesMailer extends ResourcesMailerProducer {
         return Base64.getEncoder().encodeToString(templateBytes);
     }
 
-    private String writeAsJson(final TemplateEncoded templateEncoded, MailTarget mailTarget, Map<String, String> properties)
-            throws JsonProcessingException {
-        return objectMapper.writeValueAsString(Collections.unmodifiableList(Arrays.asList(templateEncoded, mailTarget, properties)));
+    private String writeAsJson(MailPayloadWrapper wrapper) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(wrapper);
     }
 
 }

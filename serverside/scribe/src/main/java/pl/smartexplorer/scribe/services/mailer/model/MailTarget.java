@@ -1,9 +1,9 @@
 package pl.smartexplorer.scribe.services.mailer.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.io.Serializable;
 
 /**
  * @author
@@ -14,8 +14,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class MailTarget {
+public class MailTarget implements Serializable {
     private String targetEmail;
     private String username;
     private String mailTitle;
