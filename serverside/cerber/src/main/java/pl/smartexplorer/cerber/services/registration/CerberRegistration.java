@@ -83,8 +83,8 @@ public class CerberRegistration extends UserRegistrator {
             boolean result = userId.equals(registrationVerif.getUserId())
                     && verificationUuid.equals(registrationVerif.getUuid());
 
-            verifRepository.delete(registrationVerif);
             enableUser(userId);
+            verifRepository.delete(registrationVerif);
             return result;
         }
     }

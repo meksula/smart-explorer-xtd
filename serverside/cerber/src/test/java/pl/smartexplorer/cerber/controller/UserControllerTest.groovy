@@ -30,12 +30,10 @@ import pl.smartexplorer.cerber.services.registration.UserRegistrationModel
 import pl.smartexplorer.cerber.services.registration.UserRegistrator
 import spock.lang.Specification
 
-import javax.xml.ws.Response
 import java.time.LocalDateTime
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -182,7 +180,7 @@ class UserControllerTest extends Specification {
         def JSON = new ObjectMapper().writeValueAsString(user)
 
         when:
-        ResultActions response = mockMvc.perform(put("/api/v2/user/registration")
+        ResultActions response = mockMvc.perform(post("/api/v2/user/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSON))
                 .andDo(print())

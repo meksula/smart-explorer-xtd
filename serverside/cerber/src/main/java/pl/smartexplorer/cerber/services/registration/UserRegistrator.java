@@ -8,6 +8,8 @@ import pl.smartexplorer.cerber.repository.TokenRepository;
 import pl.smartexplorer.cerber.repository.UserRepository;
 import pl.smartexplorer.cerber.validators.classes.UserRegistrationValidator;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author
  * Karol Meksuła
@@ -28,7 +30,7 @@ public abstract class UserRegistrator implements RegistrationVerificator {
     protected abstract String getSev2Token();
     protected abstract String initVerificationUiid();
 
-    public CerberAuthDecisionRegistration registerUser(User user, String ipAddress) {
+    public CerberAuthDecisionRegistration registerUser(User user, HttpServletRequest request) {
         boolean flag = validator.isAbleToRegister(user);
 
         if (!flag) {
@@ -36,14 +38,14 @@ public abstract class UserRegistrator implements RegistrationVerificator {
                                 user.getUsername() + " just exist in database.";
             log.error(MSG);
 
-            return buildDecisionRegistration(user, false, MSG, null, null);
+            return buildDecisionRegistration(user, false, MSG, null, null, null);
         }
 
-        String userId = generateToken(buildTokenEstablishData(user.getUsername(), ipAddress));
+        String userId = generateToken(buildTokenEstablishData(user.getUsername(), request.getRemoteAddr()));
         user.setUserId(userId);
         User updatedUser = saveUser(user);
         return buildDecisionRegistration(updatedUser, true,
-                "User was created successfully", getSev2Token(), initVerificationUiid());
+                "User was created successfully", getSev2Token(), initVerificationUiid(), request.getRequestURL().toString());
     }
 
     private TokenEstablishData buildTokenEstablishData(String username, String ipAddress) {
@@ -63,13 +65,22 @@ public abstract class UserRegistrator implements RegistrationVerificator {
     }
 
     private CerberAuthDecisionRegistration buildDecisionRegistration(User user, boolean decission, String message,
-                                                                     String sev2token, String verificationUiid) {
+                                                                     String sev2token, String verificationUiid, String hostname) {
         CerberAuthDecisionRegistration cadr = new CerberAuthDecisionRegistration();
         cadr.setUser(user);
         cadr.setDecision(decission);
         cadr.setMessage(message);
         cadr.setSev2token(sev2token);
         cadr.setVerificationUuid(verificationUiid);
+        cadr.setVerificationLink(
+                new StringBuilder()
+                        .append(hostname)
+                        .append("/verification/")
+                        .append(user.getUserId())
+                        .append("/")
+                        .append(verificationUiid)
+                        .toString()
+        );
         return cadr;
     }
 

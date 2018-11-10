@@ -42,10 +42,10 @@ public class UserController {
      * This endpoint register new user. Notice that created user is disabled!
      * Registered user can confirm your account with other endpoint /registration/verification/{uuid}
      * */
-    @PutMapping("/registration")
+    @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
     public CerberAuthDecisionRegistration registerUser(@RequestBody User user, HttpServletRequest request) {
-        return userRegistrator.registerUser(user, request.getRemoteAddr());
+        return userRegistrator.registerUser(user, request);
     }
 
     /**
