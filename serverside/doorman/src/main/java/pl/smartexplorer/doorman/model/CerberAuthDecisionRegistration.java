@@ -13,4 +13,5 @@ import lombok.Setter;
 @Setter
 public class CerberAuthDecisionRegistration extends CerberAuthDecission {
     private String verificationUuid;
+    private String verificationLink;
 }
