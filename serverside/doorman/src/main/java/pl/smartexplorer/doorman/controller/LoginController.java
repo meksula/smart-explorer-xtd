@@ -56,11 +56,11 @@ public class LoginController {
                 response.addHeader(tokenParams[0], tokenParams[1]);
                 log.info("Builder header: " + tokenParams[0] + ", " + tokenParams[1]);
                 log.info("Logged successfully by facebook oAuth 2.0");
-                response.sendRedirect("http://localhost:8080");
+                response.sendRedirect("https://localhost:8080");
             }
         } else {
             log.info("oAuth authentication failed.");
-            response.sendRedirect("http://localhost:8010/login/error");
+            response.sendRedirect("https://localhost:8010/login/error");
         }
     }
 
