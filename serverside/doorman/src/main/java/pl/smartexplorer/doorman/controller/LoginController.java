@@ -52,6 +52,7 @@ public class LoginController {
                 response.sendRedirect(REGISTRATION);
             } else if (isNull(tokenParams)) {
                 log.info("Login attempt was failed.");
+                response.sendRedirect("https://localhost:8010/error");
             } else {
                 response.addHeader(tokenParams[0], tokenParams[1]);
                 log.info("Builder header: " + tokenParams[0] + ", " + tokenParams[1]);

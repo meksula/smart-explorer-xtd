@@ -2,13 +2,54 @@
 <html lang="pl" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Opcje logowania</title>
+    <link th:href="@{/css/style-fundamentals.css}" rel="stylesheet">
 </head>
 <body>
-    <h2>Opcje logowania</h2>
-    <br>
-    <a th:href="@{/secured/facebook}">Zaloguj się przez Facebooka</a>
-    <br>
-    <a th:href="@{/login/scribe}">Zaloguj się za pomocą konta Smart Explorer</a>
+    <header>
+        <nav>
+            <a th:href="@{/}" class="logo">Smart Explorer</a>
+            <a th:href="@{/join}">Dołącz</a>
+            <a href="#">Zaloguj</a>
+            <a th:href="@{/about}">O aplikacji</a>
+            <a th:href="@{/documentation}">API</a>
+            <a th:href="@{/}">Kontakt</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h1>Wybierz sposób logowania</h1>
+            <div>
+                <p>
+                    Zaloguj się za pomocą konta Facebook. 
+                    <p>
+                        Pamiętaj, że aby zalogować się przez Facebooka, 
+                        musisz mieć aktywne konto w ustawieniach serwisów społecznościowych.
+                        Jeśli rejestrowałeś się za pomocą Facebooka możesz teraz wybrać tą opcję logowania.
+                    </p>
+                </p>
+                <div>
+                        <a th:href="@{/secured/facebook}" class="button">Facebook login</a>
+                </div>
+            </div>
+            <div>
+                <p>
+                    Zaloguj się za pomocą nazwy użytkownika oraz hasła. 
+                    <p>
+                        Wybierz tą opcję jeżeli chcesz się zalogować z pomocą nazwy użytkownika oraz hasła. Możesz skorzystać także 
+                        z tej metody jeśli rejestrowałeś się za pomocą Facebooka. Pamiętaj jednak, że najpierw musisz ustawić 
+                        odpowiednie hasło w naszym portalu oraz pamiętać swój Facebookowy identyfikator.
+                    </p>
+                </p>
+                <a th:href="@{/login/scribe}" class="button">Login</a>
+            </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Copyright &copy; Smart Explorer 2018</p>
+    </footer>
 </body>
 </html>
