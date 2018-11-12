@@ -1,34 +1,190 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Strona logowania</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Kaushan+Script|Sintony&subset=latin-ext');
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Sintony', sans-serif;
+        }
+
+        header nav {
+            box-sizing: border-box;
+            margin: 0 auto;
+            line-height: 3.5rem;
+            background-color: #212529;
+        }
+
+        header nav a {
+            text-decoration: none;
+            font-size: 1rem;
+            color: aliceblue;
+            padding-right: 1.9rem;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        header nav a.logo {
+            padding-left: 6%;
+            padding-right: 35%;
+            font-size: 1.25em;
+            color: #fed136;
+            font-family: 'Kaushan Script', cursive;
+            text-align: left;
+        }
+
+        header nav a:hover {
+            color: #fed136;
+        }
+
+        p+p {
+            font-size: 70%;
+            text-align: justify;
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+
+        footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            color: white;
+            text-align: center;
+            background-color: #212529;
+            letter-spacing: 1.7px;
+        }
+
+        body main section {
+            background-color: rgba(240, 248, 255, 0.555);
+            height: 100vh;
+        }
+
+        body main section div {
+            background-color: rgba(228, 240, 250, 0.555);
+            margin: 0 auto;
+            width: 40%;
+            font-size: 26px;
+            text-align: center;
+        }
+
+        body main section div p {
+            padding-top: 3%;
+            padding-bottom: 2%;
+        }
+
+        .button {
+            display: inline-block;
+            color: #ffffff;
+            background-color: rgba(245, 133, 42, 0.925);
+            margin-bottom: 5%;
+            text-align: center;
+            text-transform: uppercase;
+            text-decoration: none;
+            min-width: 200px;
+            line-height: 3.5rem;
+            border: #fed136 solid 1px;
+            cursor: pointer;
+            transition: 0.8s;
+            font-size: 21px;
+        }
+
+        .button:hover {
+            background-color: rgba(240, 185, 140, 0.925);
+        }
+
+        h1 {
+            text-align: center;
+            padding-top: 2%;
+            margin-bottom: 2%;
+            color: #fed136;
+            font-size: 32px;
+        }
+
+        fieldset {
+            border: #fed136;
+        }
+
+        fieldset div {
+            padding-top: 2%;
+            background-color: red;
+        }
+
+        .form {
+            margin-top: 3%;
+            padding-top: 10px;
+        }
+
+        label {
+            display: block;
+            padding-top: 16px;
+            font-size: 16px;
+            color: #fed136;
+        }
+
+        input {
+            display: inline-block;
+            margin-top: 0.9rem;
+            margin-bottom: 1.2rem;
+            color: #212529;
+            padding: 14px 20px;
+            border: 1px solid #fed136;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .alert-error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-<html xmlns:th="http://www.thymeleaf.org">
+    <header>
+        <nav>
+            <a href="https://localhost:8010" class="logo">Smart Explorer</a>
+            <a href="https://localhost:8010/join">Dołącz</a>
+            <a href="https://localhost:8010/login/option">Zaloguj</a>
+            <a href="https://localhost:8010/about">O aplikacji</a>
+            <a href="https://localhost:8020">API</a>
+            <a href="https://localhost:8010/#contact">Kontakt</a>
+        </nav>
+    </header>
+<main>
+    <section>
+        <div class="form">
+            <form name="f" th:action="@{/login}" method="post">
+                <fieldset>
+                    <h1>Logowanie do Smart Explorer</h1>
+                    
+                    <div class="cell">
+                            <label for="username">Nazwa użytkownika</label>
+                            <input type="text" id="username" name="username"/>
+                    
+                            <label for="password">Hasło</label>
+                            <input type="password" id="password" name="password"/>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="button">Zaloguj się</button>
+                    </div>
 
-<body>
-<div th:fragment="content">
-    <form name="f" th:action="@{/login}" method="post">
-        <fieldset>
-            <legend>Please Login</legend>
-            <div th:if="${param.error}" class="alert alert-error">
-                Invalid username and password.
-            </div>
-            <div th:if="${param.logout}" class="alert alert-success">
-                You have been logged out.
-            </div>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username"/>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password"/>
-            <div class="form-actions">
-                <button type="submit" class="btn">Log in</button>
-            </div>
-        </fieldset>
-    </form>
-</div>
-</body>
-</html>
+                    <div th:if="${param.error}" class="alert-error">
+                            Nieprawidłowe dane logowania. Spróbuj ponownie.
+                    </div>
+
+                </fieldset>
+            </form>
+        </div>
+
+    </section>
+</main>
+
+    <footer>
+        <p>Copyright &copy; Smart Explorer 2018</p>
+    </footer>
 </body>
 </html>
